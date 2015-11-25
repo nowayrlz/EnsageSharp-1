@@ -125,7 +125,7 @@ namespace Necrophos
             var LinkensMod = (target.Modifiers.Any(x => x.Name == "modifier_item_sphere_target") || (target.FindItem("item_sphere") != null && (target.FindItem("item_sphere").Cooldown <= 0)));
             var WindWalkMod = me.Modifiers.Any(x => x.Name == "modifier_item_silver_edge_windwalk");
             var ShadowMod = me.Modifiers.Any(x => x.Name == "modifier_item_invisibility_edge_windwalk");
-            if ((active && ComboDamage <= 0 && me.Distance2D(target) <= rangetocombo && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null) ||( me.Distance2D(target) <= rangetocombo && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null) && active2)
+            if ((active && ComboDamage <= 0 && me.Distance2D(target) <= rangetocombo && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null) ||( me.Distance2D(target) <= rangetocombo && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null) && active2 && Utils.SleepCheck("combo"))
             {
                 Console.WriteLine(ComboDamage);
                 if (me.CanCast() && !me.IsChanneling())
@@ -140,22 +140,22 @@ namespace Necrophos
                     {
                         if (LinkensMod && (!ShadowMod || !WindWalkMod))
                         {
-                            if (euls != null && euls.CanBeCasted() && LinkensMod)
+                            if (euls != null && euls.Cooldown <= 0 && LinkensMod)
                             {
                                 euls.UseAbility(target);
                                 Utils.Sleep(100 + me.GetTurnTime(target) * 500, "euls");
                             }
-                            else if (forcestaff != null && forcestaff.CanBeCasted() && LinkensMod)
+                            else if (forcestaff != null && forcestaff.Cooldown <= 0 && LinkensMod)
                             {
                                 forcestaff.UseAbility(target);
                                 Utils.Sleep(100 + me.GetTurnTime(target) * 500, "forcestaff");
                             }
-                            else if (dagon != null && dagon.CanBeCasted())
+                            else if (dagon != null && dagon.Cooldown <= 0)
                             {
                                 dagon.UseAbility(target);
                                 Utils.Sleep(100 + me.GetTurnTime(target) * 500, "dagon");
                             }
-                            else if (ethereal != null && ethereal.CanBeCasted())
+                            else if (ethereal != null && ethereal.Cooldown <= 0)
                             {
                                 ethereal.UseAbility(target);
                                 Utils.Sleep(100 + me.GetTurnTime(target) * 500, "ethereal");
@@ -164,55 +164,52 @@ namespace Necrophos
                         else if (Rskill.Level > 0 && !LinkensMod && (!ShadowMod || !WindWalkMod))
                         {
                             var blinkposition = ((me.Position - target.Position) * 300 / me.Distance2D(target) + target.Position);
-                            if (Blink != null && Blink.CanBeCasted() && me.Distance2D(blinkposition) > 300)
+                            if (Blink != null && Blink.Cooldown <= 0 && me.Distance2D(blinkposition) > 300)
                             {
                                 Blink.UseAbility(blinkposition);
                                 Utils.Sleep(100 + me.GetTurnTime(target) * 500, "blink");
                                 Utils.ChainStun(me, 500 + Game.Ping, null, false);
                             }
-                            if (Rskill.CanBeCasted())
+                            if (Rskill.Cooldown <= 0)
                             {
                                 Rskill.UseAbility(target);
                                 Utils.Sleep(100 + me.GetTurnTime(target) * 500, "ultimate");
-                                Utils.ChainStun(me, 700 + Game.Ping, null, false);
                             }
-                            if (malevo != null && malevo.CanBeCasted())
+                            if (malevo != null && malevo.Cooldown <= 0)
                             {
                                 malevo.UseAbility(target);
                                 Utils.Sleep(100 + me.GetTurnTime(target) * 500, "malevo");
                                 Utils.ChainStun(me, 170 + Game.Ping, null, false);
                             }
-                            if (ethereal != null && ethereal.CanBeCasted())
+                            if (ethereal != null && ethereal.Cooldown <= 0)
                             {
                                 ethereal.UseAbility(target);
                                 Utils.Sleep(100 + me.GetTurnTime(target) * 500, "ethereal");
-                                Utils.ChainStun(me, 400 + Game.Ping, null, false);
+                                Utils.ChainStun(me, 200 + Game.Ping, null, false);
                             }
-                            if (veil != null && veil.CanBeCasted())
+                            if (veil != null && veil.Cooldown <= 0)
                             {
                                 veil.UseAbility(target.Position);
                                 Utils.Sleep(100 + me.GetTurnTime(target) * 500, "veil");
-                                Utils.ChainStun(me, 170 + Game.Ping, null, false);
                             }
-                            if (Qskill.Level > 0 && Qskill.CanBeCasted() && me.Distance2D(target) < 475)
+                            if (Qskill.Level > 0 && Qskill.Cooldown <= 0 && me.Distance2D(target) < 475)
                             {
                                 Qskill.UseAbility();
                                 Utils.Sleep(100 + me.GetTurnTime(target) * 500, "Qskill");
                                 Utils.ChainStun(me, 170 + Game.Ping, null, false);
                             }
-                            if (dagon != null && dagon.CanBeCasted())
+                            if (dagon != null && dagon.Cooldown <= 0)
                             {
                                 dagon.UseAbility(target);
                                 Utils.Sleep(100 + me.GetTurnTime(target) * 500, "dagon");
                                 Utils.ChainStun(me, 170 + Game.Ping, null, false);
                             }
-                            if (shivas != null && shivas.CanBeCasted())
+                            if (shivas != null && shivas.Cooldown <= 0)
                             {
                                 shivas.UseAbility();
                                 Utils.Sleep(100 + me.GetTurnTime(target) * 500, "shivas");
-                                Utils.ChainStun(me, 170 + Game.Ping, null, false);
                             }
-                            Utils.Sleep(1000, "combo");
+                            Utils.Sleep(200, "combo");
                         }
                     }
                 }
@@ -225,6 +222,8 @@ namespace Necrophos
                 veil = me.FindItem("item_veil_of_discord");
             if (ethereal == null)
                 ethereal = me.FindItem("item_ethereal_blade");
+            if (target == null || me == null)
+                return (0);
             int damagetokill = 0;
             if (target != null) {
                 if (Rskill.Level > 0 && Rskill.CanBeCasted() && !me.AghanimState())
@@ -282,32 +281,41 @@ namespace Necrophos
         }
         static void Drawing_OnEndScene(EventArgs args)
         {
-            if (Drawing.Direct3DDevice9 == null || Drawing.Direct3DDevice9.IsDisposed || !Game.IsInGame )
-                return;
-            if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame)
-                return;
-            if (Game.GameTime < 60)
-                DrawLib.Draw.DrawShadowText("Necrophos Script: ComboKey 'D' ForceComboKey 'E'  this msg will disapear in: "+(int)(60 - Game.GameTime)+" seconds", 10, 600, Color.Violet, _description);
-            var player = ObjectMgr.LocalPlayer;
-            var me = ObjectMgr.LocalHero;
-            var target = me.ClosestToMouseTarget(1000);
+            try {
+                if (Drawing.Direct3DDevice9 == null || Drawing.Direct3DDevice9.IsDisposed || !Game.IsInGame)
+                    return;
+                if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame)
+                    return;
+                var player = ObjectMgr.LocalPlayer;
+                var me = ObjectMgr.LocalHero;
+                var target = me.ClosestToMouseTarget(1000);
+                if (player == null || player.Team == Team.Observer || me.ClassID != ClassID.CDOTA_Unit_Hero_Necrolyte || me == null || target == null)
+                    return;
+                if (Rskill == null)
+                    Rskill = me.Spellbook.Spell4;
+                if (Game.GameTime < 60)
+                    DrawLib.Draw.DrawShadowText("Necrophos Script: ComboKey 'D' ForceComboKey 'E'  this msg will disapear in: " + (int)(60 - Game.GameTime) + " seconds", 10, 600, Color.Violet, _description);
 
-            if (player == null || player.Team == Team.Observer || me.ClassID != ClassID.CDOTA_Unit_Hero_Necrolyte)
-                return;
-            if (Rskill == null)
-                Rskill = me.Spellbook.Spell4;
-
-            int ComboDamage = Damagetokill();
-            DrawLib.Draw.DrawPanel(2, 400, 220, 46, 1, new ColorBGRA(0, 0, 139, 100));
-            var index = target.NetworkName.Remove(0,16);
-            if (ComboDamage > 0)
-                DrawLib.Draw.DrawShadowText("HP-TO-KILL: " + ComboDamage+ "  Hero: "+index, 4, 415, Color.Aquamarine, _HP);
-            else
-                DrawLib.Draw.DrawShadowText("Killable      Hero: " +index, 4, 415, Color.DarkRed, _HP);
-            if (active)
+                int ComboDamage = Damagetokill();
+                var index = target.NetworkName.Remove(0, 16);
+                if (ComboDamage > 0)
+                {
+                    DrawLib.Draw.DrawPanel(2, 400, 220, 46, 1, new ColorBGRA(0, 0, 139, 100));
+                    DrawLib.Draw.DrawShadowText("HP-TO-KILL: " + ComboDamage + "  Hero: " + index, 4, 415, Color.Aquamarine, _HP);
+                }
+                else
+                {
+                    DrawLib.Draw.DrawPanel(2, 400, 220, 46, 1, new ColorBGRA(0, 0, 139, 100));
+                    DrawLib.Draw.DrawShadowText("Killable      Hero: " + index, 4, 415, Color.DarkRed, _HP);
+                }
+                if (active)
+                {
+                    DrawLib.Draw.DrawPanel(2, 360, 120, 25, 1, new ColorBGRA(238, 201, 0, 100));
+                    DrawLib.Draw.DrawShadowText("Doing Combo!", 6, 360, Color.Goldenrod, _comboing);
+                }
+            }
+            catch (Exception)
             {
-                DrawLib.Draw.DrawPanel(2, 360, 120, 25, 1, new ColorBGRA(238, 201, 0, 100));
-                DrawLib.Draw.DrawShadowText("Doing Combo!", 6, 360, Color.Goldenrod, _comboing);
             }
         }
 
