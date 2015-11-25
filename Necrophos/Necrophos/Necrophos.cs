@@ -114,7 +114,7 @@ namespace Necrophos
             var LinkensMod = (target.Modifiers.Any(x => x.Name == "modifier_item_sphere_target") || (target.FindItem("item_sphere") != null && (target.FindItem("item_sphere").Cooldown <= 0)));
             var WindWalkMod = me.Modifiers.Any(x => x.Name == "modifier_item_silver_edge_windwalk");
             var ShadowMod = me.Modifiers.Any(x => x.Name == "modifier_item_invisibility_edge_windwalk");
-            if ((active && ComboDamage <= 0 && me.Distance2D(target) <= rangetocombo && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null) ||( me.Distance2D(target) <= rangetocombo && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null) && active2 && Utils.SleepCheck("combo"))
+            if ((active && ComboDamage <= 0 && me.Distance2D(target) <= rangetocombo && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null) ||( me.Distance2D(target) <= rangetocombo && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null && active2) && Utils.SleepCheck("combo"))
             {
                 Console.WriteLine(ComboDamage);
                 if (me.CanCast() && !me.IsChanneling())
