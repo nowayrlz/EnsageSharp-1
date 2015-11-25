@@ -89,28 +89,17 @@ namespace Necrophos
             if (Rskill == null)
                 Rskill = me.Spellbook.Spell4;
             // itens
-            if (Blink == null)
-                Blink = me.FindItem("item_blink");
-            if (shadow == null)
-                shadow = me.FindItem("item_invis_sword");
-            if (silveredge == null)
-                silveredge = me.FindItem("item_silver_edge");
-            if (dagon == null)
-                dagon = me.Inventory.Items.FirstOrDefault(x => x.Name.Substring(0, 10) == "item_dagon");
-            if (ethereal == null)
-                ethereal = me.FindItem("item_ethereal_blade");
-            if (veil == null)
-                veil = me.FindItem("item_veil_of_discord");
-            if (blademail == null)
-                blademail = me.FindItem("item_blade_mail");
-            if (euls == null)
-                euls = me.FindItem("item_cyclone");
-            if (shivas == null)
-                shivas = me.FindItem("item_shivas_guard");
-            if (malevo == null)
-                malevo = me.FindItem("item_orchid");
-            if (forcestaff == null)
-                forcestaff = me.FindItem("item_force_staff");
+            Blink = me.FindItem("item_blink");
+            shadow = me.FindItem("item_invis_sword");
+            silveredge = me.FindItem("item_silver_edge");
+            dagon = me.Inventory.Items.FirstOrDefault(x => x.Name.Substring(0, 10) == "item_dagon");
+            ethereal = me.FindItem("item_ethereal_blade");
+            veil = me.FindItem("item_veil_of_discord");
+            blademail = me.FindItem("item_blade_mail");
+            euls = me.FindItem("item_cyclone");
+            shivas = me.FindItem("item_shivas_guard");
+            malevo = me.FindItem("item_orchid");
+            forcestaff = me.FindItem("item_force_staff");
             int ComboDamage = 0;
             if (target != null)
                 ComboDamage = Damagetokill();
@@ -218,10 +207,8 @@ namespace Necrophos
         }
         static int Damagetokill()
         {
-            if (veil == null)
-                veil = me.FindItem("item_veil_of_discord");
-            if (ethereal == null)
-                ethereal = me.FindItem("item_ethereal_blade");
+            veil = me.FindItem("item_veil_of_discord");
+            ethereal = me.FindItem("item_ethereal_blade");
             if (target == null || me == null)
                 return (0);
             int damagetokill = 0;
@@ -286,6 +273,8 @@ namespace Necrophos
                     return;
                 if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame)
                     return;
+                if (Game.GameTime < 60)
+                    DrawLib.Draw.DrawShadowText("Necrophos Script: ComboKey 'D' ForceComboKey 'E'  this msg will disapear in: " + (int)(60 - Game.GameTime) + " seconds", 10, 600, Color.Violet, _description);
                 var player = ObjectMgr.LocalPlayer;
                 var me = ObjectMgr.LocalHero;
                 var target = me.ClosestToMouseTarget(1000);
@@ -293,8 +282,6 @@ namespace Necrophos
                     return;
                 if (Rskill == null)
                     Rskill = me.Spellbook.Spell4;
-                if (Game.GameTime < 60)
-                    DrawLib.Draw.DrawShadowText("Necrophos Script: ComboKey 'D' ForceComboKey 'E'  this msg will disapear in: " + (int)(60 - Game.GameTime) + " seconds", 10, 600, Color.Violet, _description);
 
                 int ComboDamage = Damagetokill();
                 var index = target.NetworkName.Remove(0, 16);
