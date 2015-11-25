@@ -92,7 +92,7 @@ namespace Necrophos
             Blink = me.FindItem("item_blink");
             shadow = me.FindItem("item_invis_sword");
             silveredge = me.FindItem("item_silver_edge");
-            dagon = me.Inventory.Items.FirstOrDefault(x => x.Name.Substring(0, 10) == "item_dagon");
+            dagon = me.Inventory.Items.FirstOrDefault(x => x.Name.Contains("item_dagon"));
             ethereal = me.FindItem("item_ethereal_blade");
             veil = me.FindItem("item_veil_of_discord");
             blademail = me.FindItem("item_blade_mail");
