@@ -16,7 +16,7 @@ namespace Necrophos
         private static Item Blink, shadow, silveredge, dagon, ethereal, veil, blademail, lotusorb,  euls, forcestaff, shivas, malevo;
         private static Hero me, target;
 
-        private static int rangetocombo, totaldamage;
+        private static int totaldamage;
         private static Key toggleKey = Key.D;
         private static Key forceKey  = Key.E;
         private static bool active = true;
@@ -76,7 +76,11 @@ namespace Necrophos
         {
             // initial things
             me = ObjectMgr.LocalHero;
-            target = me.ClosestToMouseTarget(1000);
+            if (active || active2 || target == null || Utils.SleepCheck("selected"))
+            {
+                target = me.ClosestToMouseTarget(1000);
+                Utils.Sleep(500,"selected");
+            }
             if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame)
                 return;
             if (me.ClassID != ClassID.CDOTA_Unit_Hero_Necrolyte)
@@ -101,20 +105,16 @@ namespace Necrophos
             malevo = me.FindItem("item_orchid");
             forcestaff = me.FindItem("item_force_staff");
             int ComboDamage = 0;
-            if (target != null)
+            if (target != null && !target.IsIllusion)
                 ComboDamage = Damagetokill();
             else
                 ComboDamage = 0;
-            // Blink Check
-            if (Blink != null && Blink.CanBeCasted())
-                rangetocombo = 1200;
-            else
-                rangetocombo = 600;
             //Starting Combo
+            var blinkposition = ((me.Position - target.Position) * 300 / me.Distance2D(target) + target.Position);
             var LinkensMod = (target.Modifiers.Any(x => x.Name == "modifier_item_sphere_target") || (target.FindItem("item_sphere") != null && (target.FindItem("item_sphere").Cooldown <= 0)));
             var WindWalkMod = me.Modifiers.Any(x => x.Name == "modifier_item_silver_edge_windwalk");
             var ShadowMod = me.Modifiers.Any(x => x.Name == "modifier_item_invisibility_edge_windwalk");
-            if ((active && ComboDamage <= 0 && me.Distance2D(target) <= rangetocombo && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null) ||( me.Distance2D(target) <= rangetocombo && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null && active2) && Utils.SleepCheck("combo"))
+            if ((active && ComboDamage <= 0 && me.Distance2D(target) <= 1000 && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null) ||( me.Distance2D(target) <= 1000 && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null && active2) && Utils.SleepCheck("combo"))
             {
                 Console.WriteLine(ComboDamage);
                 if (me.CanCast() && !me.IsChanneling())
@@ -152,7 +152,6 @@ namespace Necrophos
                         }
                         else if (Rskill.Level > 0 && !LinkensMod && (!ShadowMod || !WindWalkMod))
                         {
-                            var blinkposition = ((me.Position - target.Position) * 300 / me.Distance2D(target) + target.Position);
                             if (Blink != null && Blink.Cooldown <= 0 && me.Distance2D(blinkposition) > 300)
                             {
                                 Blink.UseAbility(blinkposition);
