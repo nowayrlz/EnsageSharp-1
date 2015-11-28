@@ -76,6 +76,11 @@ namespace TowerRange2
                     effect.SetControlPoint(1, new Vector3(1200, 0, 0));
                     Effects.Add(effect);
                 }
+                foreach (var effect in Fountains.Where(x => x.Team != me.Team).Select(Fountain => Fountain.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf")))
+                {
+                    effect.SetControlPoint(1, new Vector3(1350, 0, 0));
+                    Effects.Add(effect);
+                }
             }
             if (Menu.Item("OwnTowers").GetValue<bool>())
             {
@@ -97,6 +102,11 @@ namespace TowerRange2
                 foreach (var effect in Fountains.Where(x => x.Team == me.Team).Select(Fountain => Fountain.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf")))
                 {
                     effect.SetControlPoint(1, new Vector3(1200, 0, 0));
+                    Effects.Add(effect);
+                }
+                foreach (var effect in Fountains.Where(x => x.Team == me.Team).Select(Fountain => Fountain.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf")))
+                {
+                    effect.SetControlPoint(1, new Vector3(1350, 0, 0));
                     Effects.Add(effect);
                 }
             }
