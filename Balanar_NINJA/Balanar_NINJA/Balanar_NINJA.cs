@@ -22,10 +22,6 @@ namespace Balanar_NINJA
                 return;
             if (me == null)
                 return;
-            balanartimer = new SideMessage("Use your ultimate!", new Vector2(200, 48));
-            balanartimer.AddElement(new Vector2(142, 06), new Vector2(72, 36), Drawing.GetTexture("materials/ensage_ui/spellicons/night_stalker_darkness.vmat_c"));
-            balanartimer.AddElement("USE ULT!", new Vector2(20, 10), new Vector2(30, 20), Color.Red, FontFlags.DropShadow);
-            balanartimer.CreateMessage();
             //day
             if ((int)Game.GameTime == 190)
                 tempo = 190;
