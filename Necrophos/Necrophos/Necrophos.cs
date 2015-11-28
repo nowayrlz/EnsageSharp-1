@@ -13,10 +13,9 @@ namespace Necrophos
     class Necrophos
     {
         private static Ability Qskill, Rskill;
-        private static Item Blink, shadow, silveredge, dagon, ethereal, veil, blademail, lotusorb,  euls, forcestaff, shivas, malevo;
+        private static Item Blink, shadow, silveredge, dagon, ethereal, veil/*, blademail, lotusorb*/,  euls, forcestaff, shivas, malevo;
         private static Hero me, target;
 
-        private static int totaldamage;
         private static Key toggleKey = Key.D;
         private static Key forceKey  = Key.E;
         private static bool active = true;
@@ -99,7 +98,7 @@ namespace Necrophos
             dagon = me.Inventory.Items.FirstOrDefault(x => x.Name.Contains("item_dagon"));
             ethereal = me.FindItem("item_ethereal_blade");
             veil = me.FindItem("item_veil_of_discord");
-            blademail = me.FindItem("item_blade_mail");
+            //blademail = me.FindItem("item_blade_mail");
             euls = me.FindItem("item_cyclone");
             shivas = me.FindItem("item_shivas_guard");
             malevo = me.FindItem("item_orchid");
