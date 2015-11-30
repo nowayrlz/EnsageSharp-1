@@ -77,6 +77,12 @@
     <Reference Include="Ensage.Common">
       <HintPath>D:\EnsageSharp\LeagueSharp\System\Ensage.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Ensage.Menu">
+      <HintPath>D:\EnsageSharp\LeagueSharp\System\Ensage.Menu.dll</HintPath>
+    </Reference>
+    <Reference Include="HotKeyChanger">
+      <HintPath>D:\EnsageSharp\LeagueSharp\System\HotKeyChanger.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX">
       <HintPath>D:\EnsageSharp\LeagueSharp\System\SharpDX.dll</HintPath>
     </Reference>

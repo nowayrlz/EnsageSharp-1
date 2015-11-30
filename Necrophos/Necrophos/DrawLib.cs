@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Ensage;
 using SharpDX;
-using Ensage.Common.Extensions;
-using Ensage.Common;
 using SharpDX.Direct3D9;
 
 namespace DrawLib
@@ -22,8 +16,6 @@ namespace DrawLib
             Drawing.OnPreReset += Drawing_OnPreReset;
             Drawing.OnPostReset += Drawing_OnPostReset;
             AppDomain.CurrentDomain.DomainUnload += CurrentDomain_DomainUnload;
-
-            Console.WriteLine("> DrawLib loaded!");
         }
 
         public static void DrawFilledBox(float x, float y, float w, float h, Color color)
