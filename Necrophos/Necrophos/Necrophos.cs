@@ -27,6 +27,8 @@ namespace Necrophos
         private static readonly Menu Menu = new Menu("Necrophos", "Necrophos", true);
         private static readonly Menu _item_config = new Menu("Items", "Items");
         private static readonly Menu _abillity_config = new Menu("Abilities", "Abilities");
+        private static int stage = 0;
+        private static bool ethereal_used = false, ethereal_used2 = false;
 
         private static readonly Dictionary<string, bool> listofuse_skills1 = new Dictionary<string, bool>
             {
@@ -100,7 +102,7 @@ namespace Necrophos
             if ((Game.IsKeyDown(Menu.Item("2001").GetValue<KeyBind>().Key)) || (Game.IsKeyDown(Menu.Item("2002").GetValue<KeyBind>().Key)) || target == null || Utils.SleepCheck("selected"))
             {
                 target = me.ClosestToMouseTarget(1000);
-                Utils.Sleep(500,"selected");
+                Utils.Sleep(1200,"selected");
             }
             if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame || Game.IsChatOpen)
                 return;
@@ -134,15 +136,15 @@ namespace Necrophos
             var IsLinkensProtected = (target.Modifiers.Any(x => x.Name == "modifier_item_sphere_target") || (target.FindItem("item_sphere") != null && (target.FindItem("item_sphere").Cooldown <= 0)));
             var _Is_in_Advantage = (target.Modifiers.Any(x => x.Name == "modifier_item_blade_mail_reflect") || target.Modifiers.Any(x => x.Name == "modifier_item_lotus_orb_active") || target.Modifiers.Any(x => x.Name == "modifier_nyx_assassin_spiked_carapace") || target.Modifiers.Any(x => x.Name == "modifier_templar_assassin_refraction_damage") || target.Modifiers.Any(x => x.Name == "modifier_ursa_enrage") || target.Modifiers.Any(x => x.Name == "modifier_abaddon_borrowed_time") || (target.Modifiers.Any(x => x.Name == "modifier_dazzle_shallow_grave")));
             var WindWalkMod = me.Modifiers.Any(x => x.Name == "modifier_item_silver_edge_windwalk" || x.Name == "modifier_item_invisibility_edge_windwalk");
-            if (((Game.IsKeyDown(Menu.Item("2001").GetValue<KeyBind>().Key) && ComboDamage <= 0 && me.Distance2D(target) <= 1000 && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null && !_Is_in_Advantage) ||( me.Distance2D(target) <= 1000 && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null && Game.IsKeyDown(Menu.Item("2002").GetValue<KeyBind>().Key))) && Utils.SleepCheck("combo"))
+            if (((Game.IsKeyDown(Menu.Item("2001").GetValue<KeyBind>().Key) && (ComboDamage <= 0 || stage == 1) && me.Distance2D(target) <= 1000 && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null && !_Is_in_Advantage) || ( me.Distance2D(target) <= 1000 && target.IsVisible && target.IsAlive && !target.IsMagicImmune() && !target.IsIllusion && target != null && Game.IsKeyDown(Menu.Item("2002").GetValue<KeyBind>().Key))) && Utils.SleepCheck("combo"))
             {
+                stage = 1;
                 if (me.CanCast() && !me.IsChanneling())
                 {
                     if (WindWalkMod)
                     {
                         me.Attack(target);
-                        Utils.Sleep(100 + me.GetTurnTime(target) * 500, "shadowblade");
-                        Utils.ChainStun(me, 100 + Game.Ping, null, false);
+                        Utils.ChainStun(me, Game.Ping + shadow.GetCastDelay(me, target, true, true), null, false);
                     }
                     else
                     {
@@ -151,72 +153,96 @@ namespace Necrophos
                             if (euls != null && euls.Cooldown <= 0 && IsLinkensProtected && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(euls.Name))
                             {
                                 euls.UseAbility(target);
-                                Utils.Sleep(100 + me.GetTurnTime(target) * 500, "euls");
+                                Utils.ChainStun(me,Game.Ping+euls.GetCastDelay(me,target,true,true),null,false);
                             }
                             else if (forcestaff != null && forcestaff.Cooldown <= 0 && IsLinkensProtected && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(forcestaff.Name))
                             {
                                 forcestaff.UseAbility(target);
-                                Utils.Sleep(100 + me.GetTurnTime(target) * 500, "forcestaff");
+                                Utils.ChainStun(me, Game.Ping + forcestaff.GetCastDelay(me, target, true, true), null, false);
                             }
-                            else if (dagon != null && dagon.Cooldown <= 0 && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(dagon.Name))
+                            else if (dagon != null && dagon.Cooldown <= 0 && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_dagon"))
                             {
                                 dagon.UseAbility(target);
-                                Utils.Sleep(100 + me.GetTurnTime(target) * 500, "dagon");
+                                Utils.ChainStun(me, Game.Ping + dagon.GetCastDelay(me, target, true, true), null, false);
                             }
                             else if (ethereal != null && ethereal.Cooldown <= 0 && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(ethereal.Name))
                             {
                                 ethereal.UseAbility(target);
-                                Utils.Sleep(100 + me.GetTurnTime(target) * 500, "ethereal");
+                                Utils.ChainStun(me, Game.Ping + ethereal.GetCastDelay(me, target, true, true), null, false);
                             }
                         }
-                        else if (Rskill.Level > 0 && !IsLinkensProtected && (!WindWalkMod))
+                        else if (!IsLinkensProtected && (!WindWalkMod))
                         {
                             if (Blink != null && Blink.Cooldown <= 0 && me.Distance2D(blinkposition) > 300 && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name))
                             {
                                 Blink.UseAbility(blinkposition);
-                                Utils.Sleep(100 + me.GetTurnTime(target) * 500, "blink");
-                                Utils.ChainStun(me, 500 + Game.Ping, null, false);
-                            }
-                            if (Rskill.Cooldown <= 0 && Menu.Item("Abilities: ").GetValue<AbilityToggler>().IsEnabled(Rskill.Name))
-                            {
-                                Rskill.UseAbility(target);
-                                Utils.Sleep(100 + me.GetTurnTime(target) * 500, "ultimate");
+                                Utils.ChainStun(me, Game.Ping + Blink.GetCastDelay(me, target, true, true), null, false);
                             }
                             if (malevo != null && malevo.Cooldown <= 0 && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(malevo.Name))
                             {
                                 malevo.UseAbility(target);
-                                Utils.Sleep(100 + me.GetTurnTime(target) * 500, "malevo");
-                                Utils.ChainStun(me, 170 + Game.Ping, null, false);
+                                Utils.ChainStun(me, Game.Ping + malevo.GetCastDelay(me, target, true, true), null, false);
+                            }
+                            if (Rskill.Cooldown <= 0 && Menu.Item("Abilities: ").GetValue<AbilityToggler>().IsEnabled(Rskill.Name))
+                            {
+                                Rskill.UseAbility(target);
+                                Utils.ChainStun(me, Game.Ping + Rskill.GetCastDelay(me, target, true, true), null, false);
                             }
                             if (ethereal != null && ethereal.Cooldown <= 0 && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(ethereal.Name))
                             {
                                 ethereal.UseAbility(target);
-                                Utils.Sleep(100 + me.GetTurnTime(target) * 500, "ethereal");
-                                Utils.ChainStun(me, 200 + Game.Ping, null, false);
+                                Utils.ChainStun(me, Game.Ping + ethereal.GetCastDelay(me, target, true, true), null, false);
+                                ethereal_used = true;
+                                ethereal_used2 = true;
+                            }
+                            else
+                            {
+                                ethereal_used = false;
+                                ethereal_used2 = false;
                             }
                             if (veil != null && veil.Cooldown <= 0 && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(veil.Name))
                             {
                                 veil.UseAbility(target.Position);
-                                Utils.Sleep(100 + me.GetTurnTime(target) * 500, "veil");
+                                Utils.ChainStun(me, Game.Ping + veil.GetCastDelay(me, target, true, true), null, false);
                             }
-                            if (Qskill.Level > 0 && Qskill.Cooldown <= 0 && me.Distance2D(target) < 475 && Menu.Item("Abilities: ").GetValue<AbilityToggler>().IsEnabled(Qskill.Name))
+                            if (Qskill.Level > 0 && Qskill.Cooldown <= 0 && me.Distance2D(target) < 450 && Menu.Item("Abilities: ").GetValue<AbilityToggler>().IsEnabled(Qskill.Name))
                             {
-                                Qskill.UseAbility();
-                                Utils.Sleep(100 + me.GetTurnTime(target) * 500, "Qskill");
-                                Utils.ChainStun(me, 170 + Game.Ping, null, false);
+                                if (ethereal_used2 && target.Modifiers.Any(x => x.Name == "modifier_item_ethereal_blade_ethereal"))
+                                {
+                                    Qskill.UseAbility();
+                                    Utils.ChainStun(me, Game.Ping + Qskill.GetCastDelay(me, target, true, true), null, false);
+                                    if (!Qskill.CanBeCasted())
+                                        ethereal_used2 = false;
+                                }
+                                else if (!ethereal_used2)
+                                {
+                                    Qskill.UseAbility();
+                                    Utils.ChainStun(me, Game.Ping + Qskill.GetCastDelay(me, target, true, true), null, false);
+                                }
                             }
-                            if (dagon != null && dagon.Cooldown <= 0 && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(dagon.Name))
+                            if (dagon != null && dagon.Cooldown <= 0 && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_dagon"))
                             {
-                                dagon.UseAbility(target);
-                                Utils.Sleep(100 + me.GetTurnTime(target) * 500, "dagon");
-                                Utils.ChainStun(me, 170 + Game.Ping, null, false);
+                                if (ethereal_used && target.Modifiers.Any(x => x.Name == "modifier_item_ethereal_blade_ethereal"))
+                                {
+                                    dagon.UseAbility(target);
+                                    Utils.ChainStun(me, Game.Ping + dagon.GetCastDelay(me, target, true, true), null, false);
+                                    if (!dagon.CanBeCasted())
+                                        ethereal_used = false;
+                                }
+                                else if(!ethereal_used)
+                                {
+                                    dagon.UseAbility(target);
+                                    Utils.ChainStun(me, Game.Ping + dagon.GetCastDelay(me, target, true, true), null, false);
+                                }
                             }
                             if (shivas != null && shivas.Cooldown <= 0 && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(shivas.Name))
                             {
                                 shivas.UseAbility();
-                                Utils.Sleep(100 + me.GetTurnTime(target) * 500, "shivas");
+                                Utils.ChainStun(me, Game.Ping + shivas.GetCastDelay(me, target, true, true), null, false);
                             }
                             Utils.Sleep(200, "combo");
+                            if((shivas == null || shivas.Cooldown > 0) && (dagon == null || dagon.Cooldown > 0) && (Qskill == null || Qskill.Cooldown > 0) && (veil == null || veil.Cooldown > 0) && (shivas == null || shivas.Cooldown > 0) && (ethereal == null || ethereal.Cooldown > 0) && (Rskill == null || Rskill.Cooldown > 0) && (malevo == null || malevo.Cooldown > 0))
+                                stage = 0;
                         }
                     }
                 }
@@ -227,6 +253,7 @@ namespace Necrophos
         {
             veil = me.FindItem("item_veil_of_discord");
             ethereal = me.FindItem("item_ethereal_blade");
+            malevo = me.FindItem("item_orchid");
             if (target == null || me == null)
                 return (0);
             int damagetokill = 0;
@@ -234,13 +261,13 @@ namespace Necrophos
                 if (Rskill.Level > 0 && Rskill.CanBeCasted() && !me.AghanimState() && Menu.Item("Abilities: ").GetValue<AbilityToggler>().IsEnabled(Rskill.Name))
                     damagetokill = (int)Math.Floor((UltDmg[Rskill.Level - 1] / (1 + UltDmg[Rskill.Level - 1])) * target.MaximumHealth);
                 else if (Rskill.Level > 0 && Rskill.CanBeCasted() && me.AghanimState() && Menu.Item("Abilities: ").GetValue<AbilityToggler>().IsEnabled(Rskill.Name))
-                    damagetokill = (int)Math.Floor((UltDmg[Rskill.Level - 1] / (1 + UltDmg[Rskill.Level - 1])) * target.MaximumHealth);
+                    damagetokill = (int)Math.Floor((AUltDmg[Rskill.Level - 1] / (1 + AUltDmg[Rskill.Level - 1])) * target.MaximumHealth);
                 else
                     damagetokill = 0;
             }
             //Magic Damage
             int dagondamage = 0;
-            if (dagon != null && dagon.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(dagon.Name))
+            if (dagon != null && dagon.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_dagon"))
             {
                 dagondamage = DDamage[dagon.Level - 1];
                 damagetokill += dagondamage;
@@ -249,21 +276,22 @@ namespace Necrophos
             {
                 damagetokill += 200;
             }
-            if (Qskill.Level > 0 && Qskill.CanBeCasted() && Menu.Item("Abilities: ").GetValue<AbilityToggler>().IsEnabled(Qskill.Name) && (me.Distance2D(target) < 475 || (Blink != null && Blink.CanBeCasted())))
+            if (Qskill.Level > 0 && Qskill.CanBeCasted() && Menu.Item("Abilities: ").GetValue<AbilityToggler>().IsEnabled(Qskill.Name) && (me.Distance2D(target) < 450 || (Blink != null && Blink.CanBeCasted())))
             {
-                int[] Qskilldamage = new int[4] { 75, 125, 200, 275 };
+                int[] Qskilldamage = new int[4] { 125, 175, 225, 275 };
                 damagetokill += Qskilldamage[Qskill.Level - 1];
             }
+            double multiplier = 1;
+            //Malevolence Bonus
+            if (malevo != null && malevo.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(malevo.Name))
+                damagetokill = (int)(damagetokill * (1.3 * (1 - target.MagicDamageResist)));
             //Bonus ethereal and veil
             if (veil != null && veil.CanBeCasted() && !target.Modifiers.Any(x => x.Name == "modifier_item_veil_of_discord_debuff") && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(veil.Name))
-                damagetokill = (int)(damagetokill * (1.25 * (1 - target.MagicDamageResist)));
-            else if (ethereal != null && ethereal.CanBeCasted() && !target.Modifiers.Any(x => x.Name == "modifier_item_ethereal_blade_ethereal") && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(ethereal.Name))
-                damagetokill = (int)(damagetokill * (1.40 * (1 - target.MagicDamageResist)));
-            else if (veil != null && veil.CanBeCasted() && !target.Modifiers.Any(x => x.Name == "modifier_item_veil_of_discord_debuff") && ethereal != null && ethereal.CanBeCasted() && !target.Modifiers.Any(x => x.Name == "modifier_item_ethereal_blade_ethereal") && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(veil.Name) && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(ethereal.Name))
-                damagetokill = (int)(damagetokill * (1.75 * (1 - target.MagicDamageResist)));
-            else
-                damagetokill = (int)(damagetokill * (1 - target.MagicDamageResist));
-            //ethereal will not gain 40% bonus.
+                multiplier += 0.25;
+            if (ethereal != null && ethereal.CanBeCasted() && !target.Modifiers.Any(x => x.Name == "modifier_item_ethereal_blade_ethereal") && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(ethereal.Name))
+                multiplier += 0.40;
+            damagetokill = (int)(damagetokill * (multiplier * (1 - target.MagicDamageResist)));
+            //ethereal will not gain 40 % bonus.
             if (ethereal != null && ethereal.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(ethereal.Name))
             {
                 int damageethereal = (int)Math.Floor(((me.TotalIntelligence * 2) + 75));
