@@ -1,1 +1,2 @@
 C:\Users\Bruno\Desktop\Arquivos Jogos ou Programas\Visual Basic Scripts\bruninjaman\AutoUrn\AutoUrn\bin\Release\AutoUrn.exe.config
+C:\Users\Bruno\Desktop\Arquivos Jogos ou Programas\Visual Basic Scripts\EnsageSharp-repositories\EnsageSharp\AutoUrn\AutoUrn\bin\Release\AutoUrn.exe.config

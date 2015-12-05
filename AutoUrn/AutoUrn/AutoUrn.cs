@@ -25,7 +25,7 @@ namespace AutoUrn
                 return;
             urn_of_shadows = me.FindItem("item_urn_of_shadows");
 
-            if (!me.IsChanneling() && target != null)
+            if (!me.IsChanneling() && target != null && urn_of_shadows != null)
             {
                 if (me.CanCast() && urn_of_shadows.CanBeCasted() && target.Health <= 150 && target.Distance2D(me) <= 950 && !target.IsIllusion && target.IsAlive && Utils.SleepCheck("urn") && urn_of_shadows.CurrentCharges > 0)
                 {
