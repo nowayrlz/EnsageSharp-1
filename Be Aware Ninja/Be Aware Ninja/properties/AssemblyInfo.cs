@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AutoUrn")]
-[assembly: AssemblyDescription("Auto urn '-'")]
+[assembly: AssemblyTitle("Be Aware")]
+[assembly: AssemblyDescription("Show when enemy use an important skill or item.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("AutoUrn.properties")]
-[assembly: AssemblyCopyright("ninjaman")]
+[assembly: AssemblyProduct("Be_Aware_Ninja.properties")]
+[assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("68ab7674-7ed0-4696-a7af-b3fa99da109c")]
+[assembly: Guid("5ac8ad3a-a5aa-433d-90d3-afad8d17113e")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("1")]
+[assembly: AssemblyFileVersion("1")]
