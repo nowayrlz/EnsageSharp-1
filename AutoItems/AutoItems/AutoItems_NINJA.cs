@@ -47,7 +47,7 @@ namespace AutoItems
             item_magic_stick = me.FindItem("item_magic_stick");
             item_magic_wand = me.FindItem("item_magic_wand");
             PercentStickUse =((double)Menu.Item("Percent Configuration").GetValue<Slider>().Value / 100);
-            if (me.IsAlive && !me.IsUnitState(UnitState.Invisible) && !me.IsChanneling() && me.CanUseItems() && Utils.SleepCheck("AutoItems"))
+            if (me.IsAlive && (!me.IsUnitState(UnitState.Invisible) || me.ClassID == ClassID.CDOTA_Unit_Hero_Riki)  && !me.IsChanneling() && me.CanUseItems() && Utils.SleepCheck("AutoItems"))
             {
                 if (item_bottle != null && me.Modifiers.Any(x => x.Name == "modifier_fountain_aura_buff") && !me.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration") && (me.Health < me.MaximumHealth || me.Mana < me.MaximumMana))
                     item_bottle.UseAbility();
