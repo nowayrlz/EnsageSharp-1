@@ -45,6 +45,10 @@ namespace ES_NINJA
                 return;
             if (me.ClassID != ClassID.CDOTA_Unit_Hero_EarthSpirit)
                 return;
+
+
+            //SKILLS
+            
             if (Qskill == null)
                 Qskill = me.Spellbook.SpellQ;
             if (Wskill == null)
@@ -57,23 +61,33 @@ namespace ES_NINJA
                 Rskill = me.Spellbook.SpellR;
             if (Fskill == null)
                 Fskill = me.Spellbook.SpellF;
+
+            // UNIT VARIABLES
+
             if (stage == 1 || stunned == null)
                 stunned = ObjectMgr.GetEntities<Hero>().Where(x => x.Modifiers.Any(y => y.Name == "modifier_stunned") && !x.IsIllusion && me.Distance2D(x.NetworkPosition) <= 4000 && x.Team != me.Team).FirstOrDefault();
             stone_for_combo = ObjectMgr.GetEntities<Unit>().Where(x => x.ClassID == ClassID.CDOTA_Unit_Earth_Spirit_Stone && me.Distance2D(x.NetworkPosition) < 200).FirstOrDefault();
             stone = ObjectMgr.GetEntities<Unit>().Where(x => x.ClassID == ClassID.CDOTA_Unit_Earth_Spirit_Stone && me.Distance2D(x.NetworkPosition) < 1100).ToList();
             if (boulder_slow == null || stage_combo4 == 0)
                 boulder_slow = ObjectMgr.GetEntities<Hero>().Where(x => x.Team != me.Team && x.IsVisible && !x.IsIllusion && x.NetworkPosition.Distance2D(me.NetworkPosition) < 200 && x.Modifiers.Any(y => y.Name == "modifier_earth_spirit_rolling_boulder_slow")).FirstOrDefault();
-            if ((Game.IsKeyDown(_hotkeys_config.Item("hotkeycombo1").GetValue<KeyBind>().Key)) && !Game.IsChatOpen && stunned == null && Utils.SleepCheck("keywait"))
-            {
+
+            //KEYS TOGGLE
+
+            if ((Game.IsKeyDown(_hotkeys_config.Item("hotkeycombo1").GetValue<KeyBind>().Key)) && !Game.IsChatOpen && stunned == null)
                 key_active = true;
-                Utils.Sleep(650, "keywait");
-            }
             if ((Game.IsKeyDown(_hotkeys_config.Item("hotkeycombo3").GetValue<KeyBind>().Key)) && !Game.IsChatOpen)
                 key_active_2 = true;
-            //if ((Game.IsKeyDown(_hotkeys_config.Item("hotkeycombo4").GetValue<KeyBind>().Key)) && !Game.IsChatOpen)
-            //    key_active_3 = true;
             if ((Game.IsKeyDown(_hotkeys_config.Item("hotkeycombo5").GetValue<KeyBind>().Key)) && !Game.IsChatOpen)
                 key_active_4 = true;
+
+
+
+            //if ((Game.IsKeyDown(_hotkeys_config.Item("hotkeycombo4").GetValue<KeyBind>().Key)) && !Game.IsChatOpen)
+            //    key_active_3 = true;
+
+
+            if (key_active == false)
+            { stage = 0; key_active = false; stunned = null; }
             if (me.CanCast() && !me.IsChanneling() && key_active)
             {
                 Mouse_Position = Game.MousePosition;
@@ -82,12 +96,18 @@ namespace ES_NINJA
                     key_active = false;
                     stage = 0;
                     if (auto_atack_after_spell)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
+                        auto_atack_after_spell = false;
+                    }
                     if (auto_atack)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack 1");
+                        auto_atack = false;
+                    }
                     stunned = null;
                 }
-                if (stage == 0)
+                if (stage == 0 && Utils.SleepCheck("auto_atack_change"))
                 {
                     if (Game.GetConsoleVar("dota_player_units_auto_attack_after_spell").GetInt() == 1)
                     {
@@ -105,7 +125,6 @@ namespace ES_NINJA
                         auto_atack = false;
                     stage = 1;
                     Utils.Sleep(Game.Ping + 50, "auto_atack_change");
-                    Utils.Sleep((int)Game.Ping + 2000, "maxtime");
 
                 }
                 else if (stage == 1 && Utils.SleepCheck("Qskill") && Utils.SleepCheck("auto_atack_change"))
@@ -118,7 +137,7 @@ namespace ES_NINJA
                     if (Qskill.CanBeCasted())
                     {
                         Qskill.UseAbility((Mouse_Position - me.NetworkPosition) * 200 / Mouse_Position.Distance2D(me) + me.NetworkPosition);
-                        Utils.Sleep((int)Game.Ping + 500, "Qskill");
+                        Utils.Sleep((int)Game.Ping + 50, "Qskill");
                     }
                     else
                         stage = 2;
@@ -151,43 +170,59 @@ namespace ES_NINJA
                 else if (stage == 3 && stunned != null && stunned.Modifiers.Any(x => x.Name == "modifier_earth_spirit_geomagnetic_grip_debuff") && Utils.SleepCheck("Wskill"))
                 {
                     if (auto_atack_after_spell)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
+                        Utils.Sleep(Game.Ping + 50, "auto_attack_1");
+                        auto_atack_after_spell = false;
+                    }
                     if (auto_atack)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack 1");
-                    if (Wskill.CanBeCasted())
+                        Utils.Sleep(Game.Ping + 50, "auto_attack_1");
+                        auto_atack = false;
+                    }
+                    if (Wskill.CanBeCasted() && Utils.SleepCheck("auto_attack_1"))
                     {
                         Wskill.UseAbility(stunned.NetworkPosition);
-                        Utils.Sleep(Game.Ping + (Qskill.GetCastDelay(me, stunned, true, true) * 1000), "Wskill");
+                        Utils.Sleep(Game.Ping + (Qskill.GetCastDelay(me, stunned, true, true) * 100), "Wskill");
                     }
-                    stage = 0;
-                    key_active = false;
-                    stunned = null;
                 }
                 else if (stage == 3 && stunned == null && Utils.SleepCheck("Wskill") && (Game.IsKeyDown(_hotkeys_config.Item("hotkeycombo1").GetValue<KeyBind>().Key)))
                 {
                     if (auto_atack_after_spell)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
+                        Utils.Sleep(Game.Ping + 50, "auto_attack_1");
+                        auto_atack_after_spell = false;
+                    }
                     if (auto_atack)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack 1");
-                    if (Wskill.CanBeCasted())
+                        Utils.Sleep(Game.Ping+50, "auto_attack_1");
+                        auto_atack = false;
+                    }
+                    if (Wskill.CanBeCasted() && Utils.SleepCheck("auto_attack_1"))
                     {
                         Wskill.UseAbility(Mouse_Position);
                         Utils.Sleep((int)Game.Ping + 100, "Wskill");
                     }
+                }
+                else if (!Wskill.CanBeCasted())
+                {
                     stage = 0;
                     key_active = false;
                     stunned = null;
+                    if (auto_atack_after_spell)
+                    {
+                        Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
+                        auto_atack_after_spell = false;
+                    }
+                    if (auto_atack)
+                    {
+                        Game.ExecuteCommand("dota_player_units_auto_attack 1");
+                        auto_atack = false;
+                    }
                 }
-            }
-            if (Utils.SleepCheck("maxtime"))
-            {
-                stage = 0;
-                key_active = false;
-                stunned = null;
-                if (auto_atack_after_spell)
-                    Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
-                if (auto_atack)
-                    Game.ExecuteCommand("dota_player_units_auto_attack 1");
             }
             if (key_active_2 && !Game.IsChatOpen)
             {
@@ -196,9 +231,15 @@ namespace ES_NINJA
                     stage_combo2 = 0;
                     key_active_2 = false;
                     if (auto_atack_after_spell)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
+                        auto_atack_after_spell = false;
+                    }
                     if (auto_atack)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack 1");
+                        auto_atack = false;
+                    }
                 }
                 if (stage_combo2 == 0 || stone_peoples == null)
                 {
@@ -242,7 +283,7 @@ namespace ES_NINJA
                         {
                             int DelayCombo = 0;
                             if (stone_peoples.FirstOrDefault().NetworkPosition.Distance2D(stone_peoples.FirstOrDefault().NetworkPosition / me.NetworkPosition * 100) < 200)
-                                DelayCombo = 200;
+                                DelayCombo = 150;
                             else
                                 DelayCombo = 350;
                             Wskill.UseAbility(Mouse_Position);
@@ -260,9 +301,15 @@ namespace ES_NINJA
                             stage_combo2 = 0;
                             key_active_2 = false;
                             if (auto_atack_after_spell)
+                            {
                                 Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
+                                auto_atack_after_spell = false;
+                            }
                             if (auto_atack)
+                            {
+                                auto_atack = false;
                                 Game.ExecuteCommand("dota_player_units_auto_attack 1");
+                            }
                         }
                     }
                 }
@@ -271,9 +318,15 @@ namespace ES_NINJA
                     stage_combo2 = 0;
                     key_active_2 = false;
                     if (auto_atack_after_spell)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
+                        auto_atack_after_spell = false;
+                    }
                     if (auto_atack)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack 1");
+                        auto_atack = false;
+                    }
                 }
             }
             if (key_active_4 && !Game.IsChatOpen)
@@ -283,18 +336,30 @@ namespace ES_NINJA
                     stage_combo4 = 0;
                     key_active_4 = false;
                     if (auto_atack_after_spell)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
+                        auto_atack_after_spell = false;
+                    }
                     if (auto_atack)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack 1");
+                        auto_atack = false;
+                    }
                 }
                 if ((Game.IsKeyDown(_hotkeys_config.Item("hotkeycombo2").GetValue<KeyBind>().Key) && !Game.IsChatOpen))
                 {
                     stage_combo4 = 0;
                     key_active_4 = false;
                     if (auto_atack_after_spell)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
+                        auto_atack_after_spell = false;
+                    }
                     if (auto_atack)
+                    {
                         Game.ExecuteCommand("dota_player_units_auto_attack 1");
+                        auto_atack = false;
+                    }
                 }
                 if (stage_combo4 == 0)
                 {
@@ -380,9 +445,15 @@ namespace ES_NINJA
                                 stage_combo4 = 0;
                                 key_active_4 = false;
                                 if (auto_atack_after_spell)
+                                {
                                     Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
+                                    auto_atack_after_spell = false;
+                                }
                                 if (auto_atack)
+                                {
                                     Game.ExecuteCommand("dota_player_units_auto_attack 1");
+                                    auto_atack = false;
+                                }
                             }
                         }
                     }
@@ -424,6 +495,11 @@ namespace ES_NINJA
         static void Magnetize(EventArgs args)
         {
             if (!Game.IsInGame || Game.IsWatchingGame)
+                return;
+            me = ObjectMgr.LocalHero;
+            if (me == null)
+                return;
+            if (me.ClassID != ClassID.CDOTA_Unit_Hero_EarthSpirit)
                 return;
             System.Collections.Generic.List<Hero> Magnetized = ObjectMgr.GetEntities<Hero>().Where(x => x.Modifiers.Any(y => y.Name == "modifier_earth_spirit_magnetize") && x.IsAlive && x.IsVisible).ToList();
             foreach (Hero v in Magnetized)
