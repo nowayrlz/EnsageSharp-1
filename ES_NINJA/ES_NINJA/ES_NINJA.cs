@@ -68,6 +68,8 @@ namespace ES_NINJA
             stone = ObjectMgr.GetEntities<Unit>().Where(x => x.ClassID == ClassID.CDOTA_Unit_Earth_Spirit_Stone && x.NetworkPosition.Distance2D(me.NetworkPosition) <= 1300).ToList();
             if (boulder_slow == null || stage_combo4 == 0)
                 boulder_slow = ObjectMgr.GetEntities<Hero>().Where(x => x.Team != me.Team && x.IsVisible && !x.IsIllusion && x.NetworkPosition.Distance2D(me.NetworkPosition) < 200 && x.Modifiers.Any(y => y.Name == "modifier_earth_spirit_rolling_boulder_slow")).FirstOrDefault();
+            if (stage == 2 && stunned == null)
+                stunned = ObjectMgr.GetEntities<Hero>().Where(x => x.Modifiers.Any(y => y.Name == "modifier_stunned") && !x.IsIllusion && x.Team != me.Team && x.IsVisible).FirstOrDefault();
 
             //KEYS TOGGLE
 
@@ -80,16 +82,12 @@ namespace ES_NINJA
 
             if (key_active == false)
             { stage = 0; key_active = false; stunned = null; }
-            if (stage == 2 && stunned == null)
-                stunned = ObjectMgr.GetEntities<Hero>().Where(x => x.Modifiers.Any(y => y.Name == "modifier_stunned") && !x.IsIllusion && x.Team != me.Team && x.IsVisible).FirstOrDefault();
 
             if (me.CanCast() && !me.IsChanneling() && key_active)
             {
                 Mouse_Position = Game.MousePosition;
                 if ((!Eskill.CanBeCasted() && !Qskill.CanBeCasted() && !Wskill.CanBeCasted() && (!DRemnant.CanBeCasted() && stone_for_combo == null) || ((!DRemnant.CanBeCasted() && stone_for_combo == null))) || (Game.IsKeyDown(_hotkeys_config.Item("hotkeycombo2").GetValue<KeyBind>().Key)))
                 {
-                    key_active = false;
-                    stage = 0;
                     if (auto_atack_after_spell)
                     {
                         Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
@@ -100,6 +98,8 @@ namespace ES_NINJA
                         Game.ExecuteCommand("dota_player_units_auto_attack 1");
                         auto_atack = false;
                     }
+                    key_active = false;
+                    stage = 0;
                     stunned = null;
                 }
                 if (stage == 0 && Utils.SleepCheck("auto_atack_change"))
@@ -119,7 +119,7 @@ namespace ES_NINJA
                     else
                         auto_atack = false;
                     stage = 1;
-                    Utils.Sleep(Game.Ping + 50, "auto_atack_change");
+                    Utils.Sleep(Game.Ping, "auto_atack_change");
 
                 }
                 else if (stage == 1 && Utils.SleepCheck("Qskill") && Utils.SleepCheck("auto_atack_change"))
@@ -127,7 +127,7 @@ namespace ES_NINJA
                     if (DRemnant.CanBeCasted() && Utils.SleepCheck("DRemnant") && stone_for_combo == null && (Qskill.CanBeCasted() && Wskill.CanBeCasted() && Eskill.CanBeCasted()))
                     {
                         DRemnant.UseAbility(me.NetworkPosition);
-                        Utils.Sleep((int)Game.Ping + 500, "DRemnant");
+                        Utils.Sleep(500 - (int)Game.Ping, "DRemnant");
                     }
                     if (Qskill.CanBeCasted())
                     {
@@ -246,7 +246,7 @@ namespace ES_NINJA
                 }
                 if (stage_combo2 == 0 || stone_peoples == null)
                 {
-                    stone_peoples = ObjectMgr.GetEntities<Hero>().Where(x => x.Team != me.Team && !x.IsIllusion && x.Modifiers.Any(xy => xy.Name == "modifier_earthspirit_petrify") && x.Distance2D(me) <= 1600);
+                    stone_peoples = ObjectMgr.GetEntities<Hero>().Where(x => !x.IsIllusion && x.Modifiers.Any(xy => xy.Name == "modifier_earthspirit_petrify") && x.Distance2D(me) <= 1600);
                     Mouse_Position = Game.MousePosition;
                 }
                 if (stone_peoples.FirstOrDefault() != null && me.CanCast() && !me.IsChanneling())
@@ -288,7 +288,7 @@ namespace ES_NINJA
                             if (stone_peoples.FirstOrDefault().NetworkPosition.Distance2D(stone_peoples.FirstOrDefault().NetworkPosition / me.NetworkPosition * 100) < 200)
                                 DelayCombo = 150 - (int)Game.Ping;
                             else
-                                DelayCombo = 350 - (int)Game.Ping;
+                                DelayCombo = 400 - (int)Game.Ping;
                             Wskill.UseAbility(Mouse_Position);
                             Utils.Sleep(Game.Ping + DelayCombo + (me.GetTurnTime(Mouse_Position) * 100), "PerfectDelay");
                         }
@@ -334,22 +334,7 @@ namespace ES_NINJA
             }
             if (key_active_4 && !Game.IsChatOpen)
             {
-                if (stage_combo4 == 0 && (!Qskill.CanBeCasted() || !Wskill.CanBeCasted()))
-                {
-                    stage_combo4 = 0;
-                    key_active_4 = false;
-                    if (auto_atack_after_spell)
-                    {
-                        Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
-                        auto_atack_after_spell = false;
-                    }
-                    if (auto_atack)
-                    {
-                        Game.ExecuteCommand("dota_player_units_auto_attack 1");
-                        auto_atack = false;
-                    }
-                }
-                if ((Game.IsKeyDown(_hotkeys_config.Item("hotkeycombo2").GetValue<KeyBind>().Key) && !Game.IsChatOpen))
+                if ((stage_combo4 == 0 && (!Qskill.CanBeCasted() || !Wskill.CanBeCasted())) || (Game.IsKeyDown(_hotkeys_config.Item("hotkeycombo2").GetValue<KeyBind>().Key) && !Game.IsChatOpen))
                 {
                     stage_combo4 = 0;
                     key_active_4 = false;
@@ -393,16 +378,15 @@ namespace ES_NINJA
                         DRemnant.UseAbility(Mouse_Position);
                         Utils.Sleep((int)Game.Ping + 2000, "DRemnant");
                     }
-                    if (Eskill.CanBeCasted() && Utils.SleepCheck("Eskill_3combo"))
+                    else if (Eskill.CanBeCasted() && Utils.SleepCheck("Eskill_3combo"))
                     {
                         Eskill.UseAbility(Mouse_Position);
                         Utils.Sleep(500, "Eskill_3combo");
                     }
-                    if (!Eskill.CanBeCasted() && geomagnetic_target == null)
+                    else if ((!Eskill.CanBeCasted() || Eskill.Level == 0) && geomagnetic_target == null)
                     {
                         stone_for_combo = ObjectMgr.GetEntities<Unit>().Where(x => x.ClassID == ClassID.CDOTA_Unit_Earth_Spirit_Stone && me.Distance2D(x.NetworkPosition) < 400).FirstOrDefault();
-                        Vector3 perfect_position = (me.NetworkPosition + Mouse_Position) * 200 / me.NetworkPosition.Distance2D(Mouse_Position) + me.NetworkPosition;
-                        if (DRemnant.CanBeCasted() && Utils.SleepCheck("DRemnant") && stone_for_combo == null && (Qskill.CanBeCasted() && Wskill.CanBeCasted()) && me.Distance2D(perfect_position) <= 400)
+                        if (DRemnant.CanBeCasted() && Utils.SleepCheck("DRemnant") && stone_for_combo == null && (Qskill.CanBeCasted() && Wskill.CanBeCasted()))
                         {
                             DRemnant.UseAbility(me.NetworkPosition);
                             Utils.Sleep((int)Game.Ping + 2000, "DRemnant");
@@ -410,10 +394,8 @@ namespace ES_NINJA
                         else
                             stage_combo4 = 2;
                     }
-                    else if (!Eskill.CanBeCasted())
-                    {
+                    else if ((!Eskill.CanBeCasted() || Eskill.Level == 0) && stone_for_combo != null)
                         stage_combo4 = 2;
-                    }
                 }
                 else if (stage_combo4 == 2)
                 {
@@ -434,7 +416,7 @@ namespace ES_NINJA
                         if (Utils.SleepCheck("moving") && me.NetworkPosition.Distance2D(perfect_position) >= 70)
                         {
                             me.Move(perfect_position);
-                            Utils.Sleep(500, "moving");
+                            Utils.Sleep(500-Game.Ping, "moving");
                         }
                         if (me.NetworkPosition.ToVector2().FindAngleBetween(Mouse_Position.ToVector2(), true) - me.NetworkPosition.ToVector2().FindAngleBetween(boulder_slow.NetworkPosition.ToVector2(), true) <= 0.1 && me.NetworkPosition.ToVector2().FindAngleBetween(Mouse_Position.ToVector2(), true) - me.NetworkPosition.ToVector2().FindAngleBetween(boulder_slow.NetworkPosition.ToVector2(), true) >= -0.1)
                         {
