@@ -19,7 +19,7 @@ namespace Be_Aware_Ninja
         }
         public static void Tick(EventArgs args)
         {
-            if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame)
+            if (!Game.IsInGame)
                 return;
             me = ObjectMgr.LocalHero;
             if (me == null)
@@ -46,11 +46,11 @@ namespace Be_Aware_Ninja
                     MessageCreator("morphling", "morphling_replicate");
                     Utils.Sleep(15000, "morph");
                 }
-                if (mod.Any(x => x.Name == "modifier_ember_spirit_fire_remnant_timer") && Utils.SleepCheck("mirana")) // ember
-                {
-                    MessageCreator("ember_spirit", "ember_spirit_fire_remnant");
-                    Utils.Sleep(15000, "ember");
-                }
+                //if (mod.Any(x => x.Name == "modifier_ember_spirit_fire_remnant_timer") && Utils.SleepCheck("ember")) // ember
+                //{
+                //    MessageCreator("ember_spirit", "ember_spirit_fire_remnant");
+                //    Utils.Sleep(15000, "ember");
+                //}
                 if (mod.Any(x => x.Name == "modifier_bloodseeker_thirst_speed") && Utils.SleepCheck("bloodseeker")) //bloodseeker
                 {
                     MessageCreator("bloodseeker", "bloodseeker_thirst");
@@ -66,6 +66,55 @@ namespace Be_Aware_Ninja
                     index = v.Name.Remove(0, 14);
                     MessageItemCreator(index, "invis_sword");
                     Utils.Sleep(15000, "shadowblade");
+                }
+                if (mod.Any(x => x.Name == "modifier_rune_invis") && Utils.SleepCheck("modifier_rune_invis")) // InvisRune
+                {
+                    index = v.Name.Remove(0, 14);
+                    MessageRuneCreator(index, "rune_invis");
+                    Utils.Sleep(15000, "modifier_rune_invis");
+                }
+                if (mod.Any(x => x.Name == "modifier_rune_haste") && Utils.SleepCheck("modifier_rune_haste")) // hasteRune
+                {
+                    index = v.Name.Remove(0, 14);
+                    MessageRuneCreator(index, "rune_haste");
+                    Utils.Sleep(15000, "modifier_rune_haste");
+                }
+                if (mod.Any(x => x.Name == "modifier_rune_regen") && Utils.SleepCheck("modifier_rune_regen")) // RegenRune
+                {
+                    index = v.Name.Remove(0, 14);
+                    MessageRuneCreator(index, "rune_regen");
+                    Utils.Sleep(15000, "modifier_rune_regen");
+                }
+                if (mod.Any(x => x.Name == "modifier_rune_arcane") && Utils.SleepCheck("modifier_rune_arcane")) // ArcaneRune
+                {
+                    index = v.Name.Remove(0, 14);
+                    MessageRuneCreator(index, "rune_arcane");
+                    Utils.Sleep(15000, "modifier_rune_arcane");
+                }
+                if (mod.Any(x => x.Name == "modifier_rune_doubledamage") && Utils.SleepCheck("modifier_doubledamage")) // doubledamageRune
+                {
+                    index = v.Name.Remove(0, 14);
+                    MessageRuneCreator(index, "rune_doubledamage");
+                    Utils.Sleep(15000, "modifier_doubledamage");
+                }
+                //Console.WriteLine(me.Modifiers.LastOrDefault().Name);
+                if (mod.Any(x => x.Name == "modifier_item_shadow_amulet_fade") && Utils.SleepCheck("modifier_item_shadow_amulet_fade")) // shadow amulet
+                {
+                    index = v.Name.Remove(0, 14);
+                    MessageItemCreator(index, "shadow_amulet");
+                    Utils.Sleep(15000, "modifier_item_shadow_amulet_fade");
+                }
+                if (mod.Any(x => x.Name == "modifier_invisible") && Utils.SleepCheck("modifier_invisible")) // glimmer cape
+                {
+                    index = v.Name.Remove(0, 14);
+                    MessageItemCreator(index, "glimmer_cape");
+                    Utils.Sleep(15000, "modifier_invisible");
+                }
+                if (mod.Any(x => x.Name == "modifier_treant_natures_guise") && Utils.SleepCheck("modifier_treant_natures_guise")) //treant invis
+                {
+                    index = v.Name.Remove(0, 14);
+                    MessageCreator(index, "treant_natures_guise");
+                    Utils.Sleep(15000, "modifier_treant_natures_guise");
                 }
                 if (mod.Any(x => x.Name == "modifier_item_silver_edge_windwalk") && Utils.SleepCheck("silveredge")) // silver edge
                 {
@@ -115,6 +164,14 @@ namespace Be_Aware_Ninja
             informationmessage.AddElement(new Vector2(10, 10), new Vector2(54, 30), Drawing.GetTexture("ensage_ui/heroes_horizontal/" + saitama));
             informationmessage.AddElement(new Vector2(70, 12), new Vector2(62, 31), Drawing.GetTexture("ensage_ui/other/arrow_usual"));
             informationmessage.AddElement(new Vector2(140, 10), new Vector2(30, 30), Drawing.GetTexture("ensage_ui/spellicons/"+onepunch));
+            informationmessage.CreateMessage();
+        }
+        static void MessageRuneCreator(string saitama, string onepunch)
+        {
+            informationmessage = new SideMessage("Rune", new Vector2(180, 50));
+            informationmessage.AddElement(new Vector2(10, 10), new Vector2(54, 30), Drawing.GetTexture("ensage_ui/heroes_horizontal/" + saitama));
+            informationmessage.AddElement(new Vector2(70, 12), new Vector2(62, 31), Drawing.GetTexture("ensage_ui/other/arrow_usual"));
+            informationmessage.AddElement(new Vector2(140, 10), new Vector2(30, 30), Drawing.GetTexture("ensage_ui/modifier_textures/" + onepunch));
             informationmessage.CreateMessage();
         }
         static void MessageItemCreator(string saitama, string punch)

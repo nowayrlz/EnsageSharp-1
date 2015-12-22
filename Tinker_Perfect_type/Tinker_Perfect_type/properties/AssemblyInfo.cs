@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Be Aware")]
-[assembly: AssemblyDescription("Show when enemy use an important skill or item.")]
+[assembly: AssemblyTitle("Tinker Perfect type")]
+[assembly: AssemblyDescription("Auto Perfect Combo, Farm Key.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Be_Aware_Ninja.properties")]
+[assembly: AssemblyProduct("Tinker_Perfect_type.properties")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("5ac8ad3a-a5aa-433d-90d3-afad8d17113e")]
+[assembly: Guid("7dab40b7-d62a-4ad7-b65f-46ba18f54b7b")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.3")]
-[assembly: AssemblyFileVersion("1.3")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

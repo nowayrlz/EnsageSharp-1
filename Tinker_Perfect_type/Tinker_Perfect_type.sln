@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tinker_Perfect_type", "Tinker_Perfect_type\Tinker_Perfect_type.csproj", "{20603E6C-161F-416A-AD07-DE4532981A9E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{20603E6C-161F-416A-AD07-DE4532981A9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20603E6C-161F-416A-AD07-DE4532981A9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20603E6C-161F-416A-AD07-DE4532981A9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20603E6C-161F-416A-AD07-DE4532981A9E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

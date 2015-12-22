@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Be Aware")]
-[assembly: AssemblyDescription("Show when enemy use an important skill or item.")]
+[assembly: AssemblyTitle("Tower Range 2")]
+[assembly: AssemblyDescription("Show all building range. attack and true sight.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Be_Aware_Ninja.properties")]
+[assembly: AssemblyProduct("Tower_Range_2.properties")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("5ac8ad3a-a5aa-433d-90d3-afad8d17113e")]
+[assembly: Guid("b8cfc305-afbd-445b-acb3-dcedc70ea088")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.3")]
-[assembly: AssemblyFileVersion("1.3")]
+[assembly: AssemblyVersion("1.2")]
+[assembly: AssemblyFileVersion("1.2")]

@@ -9,14 +9,13 @@ namespace Balanar_NINJA
     {
         private static Hero me;
         private static SideMessage balanartimer;
-        private static int tempo = 190, tempo_day = 190, tempo_night = 480;
+        private static int tempo = 190, tempo_day = 190, tempo_night = 480, stage = 0;
         static void Main(string[] args)
         {
             Game.OnUpdate += Tick;
         }
         public static void Tick(EventArgs args)
         {
-            var stage = 0;
             me = ObjectMgr.LocalHero;
             if (!Game.IsInGame || Game.IsPaused || Game.IsWatchingGame)
                 return;
@@ -24,22 +23,21 @@ namespace Balanar_NINJA
                 return;
             //day
             int tempo_day = 190;
-            for (int i = 0; i == 15; i++)
+            for (int i = 0; i <= 15; i++)
             {
-                if (Game.GameTime == tempo_day)
+                if ((int)Game.GameTime == tempo_day)
                     tempo = tempo_day;
                 tempo_day += 480;
             }
             //night
             int tempo_night = 480;
-            for (int i = 0; i == 15; i++)
+            for (int i = 0; i <= 15; i++)
             {
-                if (Game.GameTime == tempo_night)
+                if ((int)Game.GameTime == tempo_night)
                     tempo = tempo_night;
+                else
                 tempo_night += 480;
             }
-
-
             if ((((int)(Game.GameTime)) == tempo))
                 {
                     if (stage == 0)
