@@ -180,7 +180,7 @@ namespace ChallengeAccepted
                                         lotusorb.UseAbility(me);
                                     else
                                         elsecount += 1;
-                                    if (bkb != null && bkb.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(bkb.Name) && (Heal != null ? Heal.Cooldown <= 0 : Heal.Cooldown >= 0) && elsecount == 5)
+                                    if (bkb != null && bkb.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(bkb.Name) && elsecount == 5)
                                         bkb.UseAbility();
                                     else
                                         elsecount += 1;
@@ -435,32 +435,34 @@ namespace ChallengeAccepted
             uint manacost = 0;
             if (me.IsAlive)
             {
-                if (blademail.CanBeCasted() && blademail != null && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(blademail.Name))
+                if (blademail != null && blademail.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(blademail.Name))
                     manacost += blademail.ManaCost;
-                if (abyssal.CanBeCasted() && abyssal != null &&  Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(abyssal.Name))
+                if (abyssal != null && abyssal.Cooldown <= 0 &&  Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(abyssal.Name))
                     manacost += abyssal.ManaCost;
-                if (mjollnir.CanBeCasted() && mjollnir != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(mjollnir.Name))
+                if (mjollnir != null && mjollnir.Cooldown <= 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(mjollnir.Name))
                     manacost += mjollnir.ManaCost;
-                if (halberd.CanBeCasted() && halberd != null && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(halberd.Name))
+                if (halberd != null && halberd.Cooldown <= 0 && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(halberd.Name))
                     manacost += halberd.ManaCost;
-                if (madness.CanBeCasted() && madness != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(madness.Name))
+                if (madness != null && madness.Cooldown <= 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(madness.Name))
                     manacost += madness.ManaCost;
-                if (lotusorb.CanBeCasted() && lotusorb != null && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(lotusorb.Name))
+                if (lotusorb != null && lotusorb.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(lotusorb.Name))
                     manacost += lotusorb.ManaCost;
-                if (buckler.CanBeCasted() && buckler != null && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(buckler.Name))
+                if (buckler != null && buckler.Cooldown <= 0 && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(buckler.Name))
                     manacost += buckler.ManaCost;
-                if (crimson.CanBeCasted() && crimson != null && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(crimson.Name))
+                if (crimson != null && crimson.Cooldown <= 0 && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(crimson.Name))
                     manacost += crimson.ManaCost;
-                if (force.CanBeCasted() && force != null && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(force.Name))
+                if (force != null && force.Cooldown <= 0 && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(force.Name))
                     manacost += force.ManaCost;
-                if (cyclone.CanBeCasted() && cyclone != null && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(cyclone.Name))
+                if (cyclone != null && cyclone.CanBeCasted() && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(cyclone.Name))
                     manacost += cyclone.ManaCost;
-                if (vyse.CanBeCasted() && vyse != null && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(vyse.Name))
+                if (vyse != null && vyse.Cooldown <= 0 && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(vyse.Name))
                     manacost += vyse.ManaCost;
-                if (Heal.CanBeCasted() && Heal != null && Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(Heal.Name))
+                if (Heal.Cooldown <= 0 && Heal.Level > 0 && Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(Heal.Name))
+                    manacost += Heal.ManaCost;
+                if (Duel.Cooldown <= 0 && Duel.Level > 0)
                     manacost += Heal.ManaCost;
             }
-            if (manacost >= me.Mana)
+            if (manacost > me.Mana)
             {
                 if (mango.CanBeCasted() && mango != null && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(mango.Name) && Utils.SleepCheck("FastMango"))
                 {
