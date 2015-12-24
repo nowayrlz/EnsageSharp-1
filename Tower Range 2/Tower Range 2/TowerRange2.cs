@@ -16,8 +16,8 @@ namespace Tower_Range_2
 
         static void Main(string[] args)
         {
-            Menu.AddItem(new MenuItem("OwnTowers", "My Towers").SetValue(true).SetTooltip("Show your tower range."));
-            Menu.AddItem(new MenuItem("EnemyTowers", "Enemies Towers").SetValue(true).SetTooltip("Show the enemies towers range."));
+            Menu.AddItem(new MenuItem("OwnTowers", "My Towers").SetValue(false).SetTooltip("Show your tower range."));
+            Menu.AddItem(new MenuItem("EnemyTowers", "Enemies Towers").SetValue(false).SetTooltip("Show the enemies towers range."));
             Menu.AddToMainMenu();
             Game.OnUpdate += FindTower;
             PrintSuccess(string.Format("> Tower Range 2 Loaded!"));
