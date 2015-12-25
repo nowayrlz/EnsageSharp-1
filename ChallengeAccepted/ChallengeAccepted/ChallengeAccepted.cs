@@ -237,133 +237,14 @@ namespace ChallengeAccepted
                                         me.Attack(target);
                                     Utils.Sleep(150, "combo");
                                 }
-                                //if (Heal.CanBeCasted() && Utils.SleepCheck("heal") && stage == 0 && me.Distance2D(target) <= 1300 && Heal != null && Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(Heal.Name))
-                                //{
-                                //    Heal.UseAbility(me);
-                                //    Utils.Sleep(100 + (Heal.GetCastDelay(me, me, true, false, Heal.Name, false) * 1000), "heal");
-                                //}
-                                //else if ((!Heal.CanBeCasted() && stage == 0) || Heal != null && !Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(Heal.Name))
-                                //    stage = 1;
-                                //if (blink.CanBeCasted() && stage == 1 && me.Distance2D(target) <= 1300 && me.Distance2D(target) >= 200 && Utils.SleepCheck("blink") && blink != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(blink.Name))
-                                //{
-                                //    blink.UseAbility(target.Position);
-                                //    Utils.Sleep(10 + (blink.GetCastDelay(me, target, true, false, blink.Name, false) * 1000), "blink");
-                                //}
-                                //else if ((!blink.CanBeCasted() && stage == 1 || (me.Distance2D(target) <= 200) && stage == 1) || blink != null && !Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(blink.Name) && stage == 1)
-                                //    stage = 2;
-                                //if (UsedInvis(target) && stage == 2)
-                                //{
-                                //    if (me.Distance2D(target) <= 500)
-                                //    {
-                                //        if (dust != null && dust.CanBeCasted() && Utils.SleepCheck("dust") && dust != null && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(dust.Name))
-                                //        {
-                                //            dust.UseAbility();
-                                //            Utils.Sleep(100 + (dust.GetCastDelay(me, me, true, false, dust.Name, false) * 1000), "dust");
-                                //        }
-                                //        else if (sentry != null && sentry.CanBeCasted() && Utils.SleepCheck("sentry") && sentry != null && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(sentry.Name))
-                                //        {
-                                //            sentry.UseAbility(me.Position);
-                                //            Utils.Sleep(100 + (sentry.GetCastDelay(me, me, true, false, sentry.Name, false) * 1000), "sentry");
-                                //        }
-                                //        stage = 3;
-                                //    }
-                                //}
-                                //else if (stage == 2)
-                                //    stage = 3;
-                                //if (crimson.CanBeCasted() && stage == 3 && Utils.SleepCheck("Crimson") && crimson != null && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(crimson.Name))
-                                //{
-                                //    crimson.UseAbility();
-                                //    Utils.Sleep(30 + (crimson.GetCastDelay(me, me, true, false, crimson.Name, false) * 1000), "Crimson");
-                                //}
-                                //else if ((!crimson.CanBeCasted() && stage == 3) || crimson != null && !Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(crimson.Name) && stage == 3)
-                                //    stage = 4;
-                                //if (buckler.CanBeCasted() && stage == 4 && Utils.SleepCheck("buckler") && buckler != null && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(buckler.Name))
-                                //{
-                                //    buckler.UseAbility();
-                                //    Utils.Sleep(30 + (buckler.GetCastDelay(me, me, true, false, buckler.Name, false) * 1000), "buckler");
-                                //}
-                                //else if ((!buckler.CanBeCasted() && stage == 4) || buckler != null && !Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(buckler.Name) && stage == 4)
-                                //    stage = 5;
-                                //if (lotusorb.CanBeCasted() && stage == 5 && Utils.SleepCheck("lotus") && lotusorb != null && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(lotusorb.Name))
-                                //{
-                                //    lotusorb.UseAbility(me);
-                                //    Utils.Sleep(30 + (lotusorb.GetCastDelay(me, me, true, false, lotusorb.Name, false) * 1000), "lotus");
-                                //}
-                                //else if ((!lotusorb.CanBeCasted() && stage == 5) || lotusorb != null && !Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(lotusorb.Name) && stage == 5)
-                                //    stage = 6;
-                                //if (bkb.CanBeCasted() && stage == 6 && Utils.SleepCheck("bkb") && bkb != null && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(bkb.Name))
-                                //{
-                                //    bkb.UseAbility(me);
-                                //    Utils.Sleep(30 + (bkb.GetCastDelay(me, me, true, false, bkb.Name, false) * 1000), "bkb");
-                                //}
-                                //else if ((!bkb.CanBeCasted() && stage == 6) || bkb != null && !Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(bkb.Name) && stage == 6)
-                                //    stage = 7;
-                                //if (mjollnir.CanBeCasted() && stage == 7 && Utils.SleepCheck("mjollnir") && mjollnir != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(mjollnir.Name))
-                                //{
-                                //    mjollnir.UseAbility(me);
-                                //    Utils.Sleep(30 + (mjollnir.GetCastDelay(me, me, true, false, mjollnir.Name, false) * 1000), "mjollnir");
-                                //}
-                                //else if ((!mjollnir.CanBeCasted() && stage == 7) || mjollnir != null && !Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(mjollnir.Name) && stage == 7)
-                                //    stage = 8;
-                                //if (armlet.CanBeCasted() && !armlet.IsToggled && stage == 8 && Utils.SleepCheck("armlet") && armlet != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(armlet.Name))
-                                //{
-                                //    armlet.ToggleAbility();
-                                //    Utils.Sleep(30 + (armlet.GetCastDelay(me, me, true, false, armlet.Name, false) * 1200), "armlet");
-                                //}
-                                //else if (((armlet == null || armlet.IsToggled) && stage == 8) || armlet != null && !Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(armlet.Name) && stage == 8)
-                                //    stage = 9;
-                                //if (madness.CanBeCasted() && stage == 9 && Utils.SleepCheck("madness") && madness != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(madness.Name))
-                                //{
-                                //    madness.UseAbility();
-                                //    Utils.Sleep(30 + (madness.GetCastDelay(me, me, true, false, madness.Name, false) * 1000), "madness");
-                                //}
-                                //else if ((!madness.CanBeCasted() && stage == 9) || (madness != null && !Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(madness.Name) && stage == 9))
-                                //    stage = 10;
-                                //if (abyssal.CanBeCasted() && stage == 10 && Utils.SleepCheck("abyssal") && abyssal != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(abyssal.Name))
-                                //{
-                                //    abyssal.UseAbility(target);
-                                //    Utils.Sleep(30 + (abyssal.GetCastDelay(me, target, true, false, abyssal.Name, false) * 1000), "abyssal");
-                                //}
-                                //else if ((!abyssal.CanBeCasted() && stage == 10) || abyssal != null && !Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(abyssal.Name) && stage == 10)
-                                //    stage = 11;
-                                //if (urn.CanBeCasted() && stage == 11 && Utils.SleepCheck("urn") && urn != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(urn.Name))
-                                //{
-                                //    urn.UseAbility(target);
-                                //    Utils.Sleep(30 + (urn.GetCastDelay(me, target, true, false, urn.Name, false) * 1000), "urn");
-                                //}
-                                //else if ((!urn.CanBeCasted() && stage == 11) || urn != null && !Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(urn.Name) && stage == 11)
-                                //    stage = 12;
-                                //if (solar.CanBeCasted() && stage == 12 && Utils.SleepCheck("solar") && solar != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(solar.Name))
-                                //{
-                                //    solar.UseAbility(target);
-                                //    Utils.Sleep(30 + (solar.GetCastDelay(me, target, true, false, solar.Name, false) * 1000), "solar");
-                                //}
-                                //else if ((!solar.CanBeCasted() && stage == 12) || solar != null && !Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(solar.Name) && stage == 12)
-                                //    stage = 13;
-                                //if (medallion.CanBeCasted() && stage == 13 && Utils.SleepCheck("medallion") && medallion != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(medallion.Name))
-                                //{
-                                //    medallion.UseAbility(target);
-                                //    Utils.Sleep(30 + (medallion.GetCastDelay(me, target, true, false, medallion.Name, false) * 1000), "medallion");
-                                //}
-                                //else if ((!medallion.CanBeCasted() && stage == 13) || medallion != null && !Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(medallion.Name) && stage == 14)
-                                //    stage = 14;
-                                //if (blademail.CanBeCasted() && stage == 14 && Utils.SleepCheck("blademail") && blademail != null && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(blademail.Name))
-                                //{
-                                //    blademail.UseAbility();
-                                //    Utils.Sleep(30 + (blademail.GetCastDelay(me, me, true, false, blademail.Name, false) * 1000), "blademail");
-                                //}
-                                //else if ((!blademail.CanBeCasted() && stage == 14) || blademail != null && !Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(blademail.Name) && stage == 14)
-                                //    stage = 15;
-                                //if (satanic.CanBeCasted() && stage == 15 && me.Health <= me.MaximumHealth * 0.5 && Utils.SleepCheck("satanic") && satanic != null && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(satanic.Name))
-                                //{
-                                //    satanic.UseAbility();
-                                //    Utils.Sleep(30 + (satanic.GetCastDelay(me, me, true, false, satanic.Name, false) * 1000), "satanic");
-                                //}
-                                //else if (((!satanic.CanBeCasted() && stage == 15) || (me.Health >= me.MaximumHealth * 0.5 && stage == 16)) || satanic != null && !Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(satanic.Name) && stage == 15)
-                                //    stage = 16;
                             }
                         }
                     }
+                }
+                else
+                {
+                    if(me.IsAlive && !me.IsChanneling())
+                    me.Move(Game.MousePosition);
                 }
             }
         }
