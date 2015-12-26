@@ -71,6 +71,7 @@ namespace ChallengeAccepted
         static void Main(string[] args)
         {
             Menu.AddItem(new MenuItem("DUEL!", "DUEL!").SetValue(new KeyBind('D', KeyBindType.Press)));
+            Menu.AddItem(new MenuItem("Black King Bar Toggle", "Black King Bar Toggle").SetValue(new KeyBind('F', KeyBindType.Press)));
             Menu.AddSubMenu(_item_config);
             Menu.AddSubMenu(_1_item_config);
             Menu.AddSubMenu(_2_item_config);
@@ -93,7 +94,12 @@ namespace ChallengeAccepted
             me = ObjectMgr.LocalHero;
             if (me == null || me.ClassID != ClassID.CDOTA_Unit_Hero_Legion_Commander)
                 return;
-            if (Game.IsKeyDown(Menu.Item("DUEL!").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
+            if (Game.IsKeyDown(Menu.Item("Black King Bar Toggle").GetValue<KeyBind>().Key) && !Game.IsChatOpen && Utils.SleepCheck("BKBTOGGLE"))
+            {
+                defensive_items["item_black_king_bar"] = !Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled("item_black_king_bar");
+                Utils.Sleep(750, "BKBTOGGLE");
+            }
+                if (Game.IsKeyDown(Menu.Item("DUEL!").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
             {
                 FindItems();
                 target = me.ClosestToMouseTarget(1000);
@@ -395,6 +401,8 @@ namespace ChallengeAccepted
                 Vector2 target_health_bar = HeroPositionOnScreen(target);
                 Drawing.DrawText("Marked for Death", target_health_bar, new Vector2(18, 200), me.Distance2D(target) < 1200 ? Color.Red : Color.Azure, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
             }
+            if (!Utils.SleepCheck("BKBTOGGLE"))
+                Drawing.DrawText(Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled("item_black_king_bar") == true ? "ON" : "OFF",new Vector2(HUDInfo.ScreenSizeX()/2, HUDInfo.ScreenSizeY()/2), new Vector2(30, 200), Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled("item_black_king_bar") == true ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
 
         }
         static Vector2 HeroPositionOnScreen(Hero x)
