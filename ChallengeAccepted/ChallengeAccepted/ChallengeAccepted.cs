@@ -407,20 +407,18 @@ namespace ChallengeAccepted
         }
         static Vector2 HeroPositionOnScreen(Hero x)
         {
-            float scaleX = ((float)Drawing.Width / 1366);
-            float scaleY = ((float)Drawing.Height / 768);
+            float scaleX = HUDInfo.ScreenSizeX();
+            float scaleY = HUDInfo.ScreenSizeY();
             Vector2 PicPosition;
-            Vector2 Final;
             Drawing.WorldToScreen(x.Position, out PicPosition);
-            PicPosition += new Vector2(-51 * scaleX, -22 * scaleY) + new Vector2((float)62.5 * scaleX, 14 * scaleY);
-            Final = new Vector2(((PicPosition.X) + (27 * scaleX)) + 30, (PicPosition.Y - (0 * scaleY))) - 90;
-            return Final;
+            PicPosition = new Vector2((float)(PicPosition.X + (scaleX * -0.035)), (float)((PicPosition.Y) + (scaleY * -0.10)));
+            return PicPosition;
         }
-        private static void PrintSuccess(string text, params object[] arguments) //thanks jumper attacker
+        private static void PrintSuccess(string text, params object[] arguments)
         {
             PrintEncolored(text, ConsoleColor.Green, arguments);
         }
-        private static void PrintEncolored(string text, ConsoleColor color, params object[] arguments) //thanks jumper attacker
+        private static void PrintEncolored(string text, ConsoleColor color, params object[] arguments)
         {
             var clr = Console.ForegroundColor;
             Console.ForegroundColor = color;
