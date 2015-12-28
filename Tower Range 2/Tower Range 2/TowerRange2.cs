@@ -3,6 +3,7 @@ using System.Linq;
 using Ensage;
 using SharpDX;
 using Ensage.Common.Menu;
+using Ensage.Common;
 using System.Collections.Generic;
 
 namespace Tower_Range_2
@@ -18,6 +19,9 @@ namespace Tower_Range_2
         {
             Menu.AddItem(new MenuItem("OwnTowers", "My Towers").SetValue(false).SetTooltip("Show your tower range."));
             Menu.AddItem(new MenuItem("EnemyTowers", "Enemies Towers").SetValue(false).SetTooltip("Show the enemies towers range."));
+            Menu.AddItem(
+                new MenuItem("Reload time", "Reload Time").SetValue(new Slider(500,15000))
+                    .SetTooltip("Set how many seconds to reload range check."));
             Menu.AddToMainMenu();
             Game.OnUpdate += FindTower;
             PrintSuccess(string.Format("> Tower Range 2 Loaded!"));
@@ -41,7 +45,7 @@ namespace Tower_Range_2
             if (!building.Any() && !Fountain.Any())
                 return;
             uint i = 0;
-            if (Menu.Item("EnemyTowers").GetValue<bool>())
+            if (Menu.Item("EnemyTowers").GetValue<bool>() && Utils.SleepCheck("reload1"))
             {
                 foreach (Building build in building.Where(x => x.Team != me.Team).ToList())
                 {
@@ -99,8 +103,9 @@ namespace Tower_Range_2
                         }
                     }
                 }
+                Utils.Sleep(Menu.Item("Reload time").GetValue<Slider>().Value, "reload1");
             }
-            if (Menu.Item("OwnTowers").GetValue<bool>())
+            if (Menu.Item("OwnTowers").GetValue<bool>() && Utils.SleepCheck("reload"))
             {
                 foreach (Building build in building.Where(x => x.Team == me.Team).ToList())
                 {
@@ -158,6 +163,7 @@ namespace Tower_Range_2
                         }
                     }
                 }
+                Utils.Sleep(Menu.Item("Reload time").GetValue<Slider>().Value, "reload");
             }
         }
         private static void PrintSuccess(string text, params object[] arguments)
