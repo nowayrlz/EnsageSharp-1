@@ -114,65 +114,40 @@ namespace ChallengeAccepted
                             manacheck();
                             if (target.IsLinkensProtected())
                             {
-                                if ((cyclone.CanBeCasted() || force.CanBeCasted() || halberd.CanBeCasted() || vyse.CanBeCasted() || abyssal.CanBeCasted()) && Utils.SleepCheck("Combo2"))
+                                if (cyclone != null && cyclone.CanBeCasted() && Utils.SleepCheck("CycloneRemoveLinkens") && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(cyclone.Name) && me.Mana - cyclone.ManaCost >= 75)
                                 {
-                                    if (blademail != null && blademail.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(blademail.Name) && me.Mana - blademail.ManaCost >= 75)
-                                        blademail.UseAbility();
-                                    if (satanic != null && satanic.Cooldown <= 0 && me.Health <= me.MaximumHealth * 0.5 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(satanic.Name))
-                                        satanic.UseAbility();
-                                    if (crimson != null && crimson.Cooldown <= 0 && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(crimson.Name))
-                                        crimson.UseAbility();
-                                    if (buckler != null && buckler.Cooldown <= 0 && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(buckler.Name) && me.Mana - buckler.ManaCost >= 75)
-                                        buckler.UseAbility();
-                                    if (lotusorb != null && lotusorb.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(lotusorb.Name) && me.Mana - lotusorb.ManaCost >= 75)
-                                        lotusorb.UseAbility(me);
-                                    if (mjollnir != null && mjollnir.Cooldown <= 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(mjollnir.Name) && me.Mana - mjollnir.ManaCost >= 75)
-                                        mjollnir.UseAbility(me);
-                                    if (armlet != null && !armlet.IsToggled && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(armlet.Name) && Utils.SleepCheck("armlet"))
-                                    {
-                                        armlet.ToggleAbility();
-                                        Utils.Sleep(300, "armlet");
-                                    }
-                                    if (madness != null && madness.Cooldown <= 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(madness.Name) && me.Mana - madness.ManaCost >= 75)
-                                        madness.UseAbility();
-                                    if (Heal != null && Heal.Level > 0 && Heal.Cooldown <= 0 && Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(Heal.Name) && !me.IsMagicImmune() && me.Mana - Heal.ManaCost >= 75)
-                                        Heal.UseAbility(me);
-                                    if (bkb != null && bkb.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(bkb.Name) && (!Heal.CanBeCasted() || Heal == null))
-                                        bkb.UseAbility();
-                                    if (blink != null && blink.Cooldown <= 0 && me.Distance2D(target) <= 1300 && me.Distance2D(target) >= 200 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(blink.Name))
+                                    if (blink.CanBeCasted() && blink != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(blink.Name))
                                         blink.UseAbility(target.Position);
-                                    if (urn != null && urn.CurrentCharges > 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(urn.Name))
-                                        urn.UseAbility(target);
-                                    if (solar != null && solar.CanBeCasted() && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(solar.Name))
-                                        solar.UseAbility(target);
-                                    if (medallion != null && medallion.CanBeCasted() && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(medallion.Name))
-                                        medallion.UseAbility(target);
-                                    if (cyclone != null && cyclone.CanBeCasted() && Utils.SleepCheck("CycloneRemoveLinkens") && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(cyclone.Name) && me.Mana - cyclone.ManaCost >= 75)
-                                    {
-                                        cyclone.UseAbility(target);
-                                        Utils.Sleep(100, "CycloneRemoveLinkens");
-                                    }
-                                    else if (force != null && force.CanBeCasted() && Utils.SleepCheck("ForceRemoveLinkens") && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(force.Name) && me.Mana - force.ManaCost >= 75)
-                                    {
-                                        force.UseAbility(target);
-                                        Utils.Sleep(100, "ForceRemoveLinkens");
-                                    }
-                                    else if (halberd != null && halberd.CanBeCasted() && Utils.SleepCheck("halberdLinkens") && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(halberd.Name) && me.Mana - halberd.ManaCost >= 75)
-                                    {
-                                        halberd.UseAbility(target);
-                                        Utils.Sleep(100, "halberdLinkens");
-                                    }
-                                    else if (vyse != null && vyse.CanBeCasted() && Utils.SleepCheck("vyseLinkens") && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(vyse.Name) && me.Mana - vyse.ManaCost >= 75)
-                                    {
-                                        vyse.UseAbility(target);
-                                        Utils.Sleep(100, "vyseLinkens");
-                                    }
-                                    else if (abyssal != null && abyssal.CanBeCasted() && Utils.SleepCheck("abyssal") && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(abyssal.Name) && me.Mana - abyssal.ManaCost >= 75)
-                                    {
-                                        abyssal.UseAbility(target);
-                                        Utils.Sleep(100, "abyssal");
-                                    }
-                                    Utils.Sleep(200, "Combo2");
+                                    cyclone.UseAbility(target);
+                                    Utils.Sleep(100, "CycloneRemoveLinkens");
+                                }
+                                else if (force != null && force.CanBeCasted() && Utils.SleepCheck("ForceRemoveLinkens") && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(force.Name) && me.Mana - force.ManaCost >= 75)
+                                {
+                                    if (blink.CanBeCasted() && blink != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(blink.Name))
+                                        blink.UseAbility(target.Position);
+                                    force.UseAbility(target);
+                                    Utils.Sleep(100, "ForceRemoveLinkens");
+                                }
+                                else if (halberd != null && halberd.CanBeCasted() && Utils.SleepCheck("halberdLinkens") && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(halberd.Name) && me.Mana - halberd.ManaCost >= 75)
+                                {
+                                    if (blink.CanBeCasted() && blink != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(blink.Name))
+                                        blink.UseAbility(target.Position);
+                                    halberd.UseAbility(target);
+                                    Utils.Sleep(100, "halberdLinkens");
+                                }
+                                else if (vyse != null && vyse.CanBeCasted() && Utils.SleepCheck("vyseLinkens") && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(vyse.Name) && me.Mana - vyse.ManaCost >= 75)
+                                {
+                                    if (blink.CanBeCasted() && blink != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(blink.Name))
+                                        blink.UseAbility(target.Position);
+                                    vyse.UseAbility(target);
+                                    Utils.Sleep(100, "vyseLinkens");
+                                }
+                                else if (abyssal != null && abyssal.CanBeCasted() && Utils.SleepCheck("abyssal") && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(abyssal.Name) && me.Mana - abyssal.ManaCost >= 75)
+                                {
+                                    if (blink.CanBeCasted() && blink != null && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(blink.Name))
+                                        blink.UseAbility(target.Position);
+                                    abyssal.UseAbility(target);
+                                    Utils.Sleep(100, "abyssal");
                                 }
                             }
                             else
@@ -265,7 +240,7 @@ namespace ChallengeAccepted
                                         Utils.Sleep(100, "Duel");
                                     }
                                     else
-                                        me.Attack(target,false);
+                                        me.Attack(target);
                                     Utils.Sleep(150, "combo");
                                 }
                             }
@@ -275,7 +250,7 @@ namespace ChallengeAccepted
                 else
                 {
                     if(me.IsAlive && !me.IsChanneling())
-                    me.Move(Game.MousePosition,false);
+                    me.Move(Game.MousePosition);
                 }
             }
         }
