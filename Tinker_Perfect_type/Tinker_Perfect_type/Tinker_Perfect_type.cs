@@ -5,9 +5,6 @@ using Ensage;
 using Ensage.Common.Extensions;
 using Ensage.Common;
 using Ensage.Common.Menu;
-using System.Text;
-using System.Threading.Tasks;
-using SharpDX.Direct3D9;
 using SharpDX;
 
 namespace Tinker_Perfect_type
@@ -15,8 +12,9 @@ namespace Tinker_Perfect_type
     class Tinker_Perfect_type
     {
         private static Ability Laser, Rocket, Refresh, March;
-        private static Item Blink, Dagon, Hex, Soulring, Ethereal, Shiva, ghost, euls, forcestaff;
+        private static Item Blink, Dagon, Hex, Soulring, Ethereal, Shiva, ghost, euls, forcestaff, glimmer;
         private static Hero me, target;
+        private static bool auto_attack, auto_attack_after_spell;
         private static readonly Menu Menu = new Menu("Tinker Perfect", "Tinker Perfect", true);
         private static readonly Menu _skills = new Menu("Skills", "Skills");
         private static readonly Menu _items = new Menu("Items", "Items");
@@ -24,30 +22,46 @@ namespace Tinker_Perfect_type
             {
                 {"tinker_laser",true},
                 {"tinker_heat_seeking_missile",true},
-                {"tinker_rearm",true},
-                {"tinker_march_of_the_machines",true}
+                {"tinker_rearm",true}
+                //{"tinker_march_of_the_machines",true}
             };
         private static readonly Dictionary<string, bool> Items = new Dictionary<string, bool>
             {
-                {"item_blink",true},
+                //{"item_blink",true},
                 {"item_dagon",true},
                 {"item_sheepstick",true},
                 {"item_soul_ring",true},
                 {"item_ethereal_blade",true},
-                {"item_shivas_guard",true},
+                {"item_shivas_guard",true}
+            };
+        private static readonly Dictionary<string, bool> Items2 = new Dictionary<string, bool>
+            {
                 {"item_ghost",true},
                 {"item_cyclone",true},
-                {"item_force_staff",true}
+                {"item_force_staff",true},
+                {"item_glimmer_cape",true}
             };
 
         static void Main(string[] args)
         {
+            // Menu Options
             Menu.AddItem(new MenuItem("Combo Key", "Combo Key").SetValue(new KeyBind('D', KeyBindType.Press)));
             Menu.AddSubMenu(_skills);
             Menu.AddSubMenu(_items);
             _skills.AddItem(new MenuItem("Skills: ", "Skills: ").SetValue(new AbilityToggler(Skills)));
-            _items.AddItem(new MenuItem("Items: ", "Items: ").SetValue(new AbilityToggler(Items)));
+            _items.AddItem(new MenuItem("Items: ", "Items 1:").SetValue(new AbilityToggler(Items)));
+            _items.AddItem(new MenuItem("Items2: ", "Items 2: ").SetValue(new AbilityToggler(Items2)));
             Menu.AddToMainMenu();
+            // Auto Attack Checker
+            if (Game.GetConsoleVar("dota_player_units_auto_attack_after_spell").GetInt() == 1)
+                auto_attack_after_spell = true;
+            else
+                auto_attack_after_spell = false;
+            if (Game.GetConsoleVar("dota_player_units_auto_attack").GetInt() == 1)
+                auto_attack = true;
+            else
+                auto_attack = false;
+            // start
             PrintSuccess(string.Format("> Tinker Perfect Type Loaded!"));
             Game.OnUpdate += Tinker_In_Madness;
             Drawing.OnDraw += markedfordeath;
@@ -66,10 +80,11 @@ namespace Tinker_Perfect_type
                 target = me.ClosestToMouseTarget(1000);
                 if (target != null && target.IsAlive && !target.IsIllusion && !me.IsChanneling())
                 {
+                    autoattack(true);
                     FindItems();
                     if (target.IsLinkensProtected())
                     {
-                        if (euls != null && euls.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(euls.Name))
+                        if (euls != null && euls.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(euls.Name))
                         {
                             if (Utils.SleepCheck("TimingToLinkens"))
                             {
@@ -77,7 +92,7 @@ namespace Tinker_Perfect_type
                                 Utils.Sleep(200, "TimingToLinkens");
                             }
                         }
-                        else if (forcestaff != null && forcestaff.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(forcestaff.Name))
+                        else if (forcestaff != null && forcestaff.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(forcestaff.Name))
                         {
                             if (Utils.SleepCheck("TimingToLinkens"))
                             {
@@ -125,8 +140,12 @@ namespace Tinker_Perfect_type
                         bool magicimune = (!target.IsMagicImmune() && !target.Modifiers.Any(x => x.Name == "modifier_eul_cyclone"));
                         if (Utils.SleepCheck("combo"))
                         {
-                            // ghost -> soulring -> hex -> laser -> ethereal -> dagon -> rocket -> shivas -> euls -> refresh
-                            if (ghost != null && Ethereal == null && ghost.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name) && Utils.SleepCheck("Rearm"))
+                            // glimmer -> ghost -> soulring -> hex -> laser -> ethereal -> dagon -> rocket -> shivas -> euls -> refresh
+                            if (glimmer != null && glimmer.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(glimmer.Name) && Utils.SleepCheck("Rearm"))
+                                glimmer.UseAbility(me);
+                            else
+                                elsecount += 1;
+                            if (ghost != null && Ethereal == null && ghost.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name) && Utils.SleepCheck("Rearm"))
                                 ghost.UseAbility();
                             else
                                 elsecount += 1;
@@ -142,10 +161,11 @@ namespace Tinker_Perfect_type
                                 Laser.UseAbility(target);
                             else
                                 elsecount += 1;
-                            if (Ethereal != null && Ethereal.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Ethereal.Name) && magicimune && Utils.SleepCheck("Rearm") && Utils.SleepCheck("EtherealTime"))
+                            if (Ethereal != null && Ethereal.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Ethereal.Name) && magicimune && Utils.SleepCheck("Rearm"))
                             {
                                 Ethereal.UseAbility(target);
-                                Utils.Sleep((me.NetworkPosition.Distance2D(target.NetworkPosition) / 650) * 1000, "EtherealTime");
+                                if (Utils.SleepCheck("EtherealTime") && me.Distance2D(target) <= Ethereal.CastRange)
+                                    Utils.Sleep((me.NetworkPosition.Distance2D(target.NetworkPosition) / 620) * 1000, "EtherealTime");
                             }
                             else
                                 elsecount += 1;
@@ -153,10 +173,11 @@ namespace Tinker_Perfect_type
                                 Dagon.UseAbility(target);
                             else
                                 elsecount += 1;
-                            if (Rocket != null && Rocket.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Rocket.Name) && magicimune && Utils.SleepCheck("Rearm") && Utils.SleepCheck("RocketTime"))
+                            if (Rocket != null && Rocket.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Rocket.Name) && magicimune && Utils.SleepCheck("Rearm"))
                             {
                                 Rocket.UseAbility();
-                                Utils.Sleep((me.NetworkPosition.Distance2D(target.NetworkPosition) / 600) * 1000, "RocketTime");
+                                if (Utils.SleepCheck("RocketTime") && me.Distance2D(target) <= Rocket.CastRange)
+                                    Utils.Sleep((me.NetworkPosition.Distance2D(target.NetworkPosition) / 600) * 1000, "RocketTime");
                             }
                             else
                                 elsecount += 1;
@@ -164,14 +185,14 @@ namespace Tinker_Perfect_type
                                 Shiva.UseAbility();
                             else
                                 elsecount += 1;
-                            if (elsecount == 8 && euls != null && euls.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(euls.Name) && magicimune && Utils.SleepCheck("Rearm") && Utils.SleepCheck("EtherealTime") && Utils.SleepCheck("RocketTime"))
+                            if (elsecount == 9 && euls != null && euls.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(euls.Name) && magicimune && Utils.SleepCheck("Rearm") && Utils.SleepCheck("EtherealTime") && Utils.SleepCheck("RocketTime"))
                                 euls.UseAbility(target);
                             else
                                 elsecount += 1;
-                            if (elsecount == 9 && Refresh != null && Refresh.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name) && !Refresh.IsChanneling && Utils.SleepCheck("Rearm") && Ready_for_refresh())
+                            if (elsecount == 10 && Refresh != null && Refresh.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name) && !Refresh.IsChanneling && Utils.SleepCheck("Rearm") && Ready_for_refresh())
                             {
                                 Refresh.UseAbility();
-                                Utils.Sleep(900, "Rearm");
+                                Utils.Sleep(800, "Rearm");
                             }
                             else
                             {
@@ -184,10 +205,31 @@ namespace Tinker_Perfect_type
                 }
                 else
                 {
+                    autoattack(false);
                     if (!me.IsChanneling() && Utils.SleepCheck("Rearm"))
                         me.Move(Game.MousePosition);
                 }
             }
+            else
+                autoattack(false);
+        }
+        static void autoattack(bool key)
+        {
+            if(key)
+            {
+                if(auto_attack)
+                    Game.ExecuteCommand("dota_player_units_auto_attack 0");
+                if(auto_attack_after_spell)
+                    Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 0");
+            }
+            else
+            {
+                if (auto_attack)
+                    Game.ExecuteCommand("dota_player_units_auto_attack 1");
+                if (auto_attack_after_spell)
+                    Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 1");
+            }
+
         }
         static void markedfordeath(EventArgs args)
         {
@@ -223,6 +265,7 @@ namespace Tinker_Perfect_type
             ghost = me.FindItem("item_ghost");
             euls = me.FindItem("item_cyclone");
             forcestaff = me.FindItem("item_force_staff");
+            glimmer = me.FindItem("item_glimmer_cape");
         }
         static Vector2 HeroPositionOnScreen(Hero x)
         {
@@ -235,7 +278,7 @@ namespace Tinker_Perfect_type
         }
         static bool Ready_for_refresh()
         {
-            if ((ghost != null && ghost.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name)) 
+            if ((ghost != null && ghost.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name)) 
                 || (Soulring != null && Soulring.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)) 
                 || (Hex != null && Hex.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Hex.Name)) 
                 || (Laser != null && Laser.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Laser.Name)) 
@@ -243,7 +286,8 @@ namespace Tinker_Perfect_type
                 || (Dagon != null && Dagon.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_dagon")) 
                 || (Rocket != null && Rocket.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Rocket.Name)) 
                 || (Shiva != null && Shiva.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Shiva.Name)) 
-                || (euls != null && euls.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(euls.Name)))
+                || (euls != null && euls.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(euls.Name))
+                || (glimmer != null && glimmer.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(glimmer.Name)))
                 return false;
             else
                 return true;
