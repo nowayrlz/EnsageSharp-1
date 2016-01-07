@@ -1,10 +1,8 @@
 ﻿using System;
 using Ensage;
 using SharpDX;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Ensage;
 
 
 namespace EXP_RANGE_NINJA
@@ -38,11 +36,12 @@ namespace EXP_RANGE_NINJA
                     if (m.IsAlive)
                     {
                         if (rangedisplay_meepo[i] == null)
-                            rangedisplay_meepo[i] = m.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                        if (rangedisplay_meepo[i].GetHighestControlPoint() != 1)
+                            rangedisplay_meepo[i] = m.AddParticleEffect(@"particles\ui_mouseactions\drag_selected_ring.vpcf");
+                        if (rangedisplay_meepo[i].GetHighestControlPoint() != 2)
                         {
-                            rangedisplay_meepo[i] = m.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                            rangedisplay_meepo[i].SetControlPoint(1, new Vector3(_range_exp, 0, 0));
+                            rangedisplay_meepo[i] = m.AddParticleEffect(@"particles\ui_mouseactions\drag_selected_ring.vpcf");
+                            rangedisplay_meepo[i].SetControlPoint(1, new Vector3(255, 255, 0));
+                            rangedisplay_meepo[i].SetControlPoint(2, new Vector3(_range_exp, 255    , 0));
                         }
                     }
                     else
@@ -54,11 +53,12 @@ namespace EXP_RANGE_NINJA
                 if (me.IsAlive)
                 {
                     if (rangedisplay == null)
-                        rangedisplay = me.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                    if (rangedisplay.GetHighestControlPoint() != 1)
+                        rangedisplay = me.AddParticleEffect(@"particles\ui_mouseactions\drag_selected_ring.vpcf");
+                    if (rangedisplay.GetHighestControlPoint() != 2)
                     {
-                        rangedisplay = me.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                        rangedisplay.SetControlPoint(1, new Vector3(_range_exp, 0, 0));
+                        rangedisplay = me.AddParticleEffect(@"particles\ui_mouseactions\drag_selected_ring.vpcf");
+                        rangedisplay.SetControlPoint(1, new Vector3(255, 255, 0));
+                        rangedisplay.SetControlPoint(2, new Vector3(_range_exp, 255, 0));
                     }
                 }
                 else

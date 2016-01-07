@@ -49,22 +49,26 @@ namespace AutoItems
                 item_magic_stick = me.FindItem("item_magic_stick");
                 item_magic_wand = me.FindItem("item_magic_wand");
                 PercentStickUse = ((double)Menu.Item("Percent Configuration").GetValue<Slider>().Value / 100);
-                if (item_bottle != null && me.Modifiers.Any(x => x.Name == "modifier_fountain_aura_buff") && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_bottle.Name))
+                if (item_bottle != null && me.Modifiers.Any(x => x.Name == "modifier_fountain_aura_buff") && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_bottle.Name) && Utils.SleepCheck("bottle"))
                 {
                     if(!me.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration") && (me.Health < me.MaximumHealth || me.Mana < me.MaximumMana))
-                        item_bottle.UseAbility();
+                        item_bottle.UseAbility(false);
                     Alies = ObjectMgr.GetEntities<Hero>().Where(x => x.Team == me.Team && x != me && (x.Health < x.MaximumHealth || x.Mana < x.MaximumMana) && !x.Modifiers.Any(y => y.Name == "modifier_bottle_regeneration") && x.IsAlive && !x.IsIllusion && x.Distance2D(me) <= item_bottle.CastRange).ToList();
                     foreach (Hero v in Alies)
                         if (v != null)
-                            item_bottle.UseAbility(v);
+                            item_bottle.UseAbility(v,false);
+                    Utils.Sleep(300, "bottle");
                 }
-                if (item_phase_boots != null && item_phase_boots.CanBeCasted() && me.NetworkActivity == NetworkActivity.Move && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_phase_boots.Name))
-                    item_phase_boots.UseAbility();
+                if (item_phase_boots != null && item_phase_boots.CanBeCasted() && me.NetworkActivity == NetworkActivity.Move && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_phase_boots.Name) && Utils.SleepCheck("phaseboots"))
+                {
+                    item_phase_boots.UseAbility(false);
+                    Utils.Sleep(300, "phaseboots");
+                }
                 if (item_magic_stick != null && item_magic_stick.CanBeCasted() && item_magic_stick.CurrentCharges > 0 && (double)me.Health / me.MaximumHealth < PercentStickUse && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_magic_stick.Name))
-                    item_magic_stick.UseAbility();
+                    item_magic_stick.UseAbility(false);
                 if (item_magic_wand != null && item_magic_wand.CanBeCasted() && item_magic_wand.CurrentCharges > 0 && (double)me.Health / me.MaximumHealth < PercentStickUse && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_magic_wand.Name))
-                    item_magic_wand.UseAbility();
-                Utils.Sleep(250, "AutoItems");
+                    item_magic_wand.UseAbility(false);
+                Utils.Sleep(800, "AutoItems");
             }
         }
         private static void PrintSuccess(string text, params object[] arguments)
