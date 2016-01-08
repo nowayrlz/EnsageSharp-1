@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Linq;
 using Ensage;
-using SharpDX;
 using Ensage.Common;
 using Ensage.Common.Extensions;
-using System.Collections.Generic;
 
 namespace AutoDeward
 {
     class Program
     {
         private static Hero me;
-        private static string[] items;
+        private static readonly string[] items = { "item_quelling_blade", "item_iron_talon", "item_bfury", "item_tango_single", "item_tango" };
         private static void Main()
         {
             Game.OnUpdate += Game_OnUpdate;
@@ -28,45 +26,26 @@ namespace AutoDeward
 
             if (!me.IsAlive)
                 return;
-            Unit wards = ObjectMgr.GetEntities<Unit>()
-                .Where(
+            Unit Things = ObjectMgr.GetEntities<Unit>()
+                .FirstOrDefault(
                     x =>
                         (x.ClassID == ClassID.CDOTA_NPC_Observer_Ward ||
-                         x.ClassID == ClassID.CDOTA_NPC_Observer_Ward_TrueSight || x.ClassID == ClassID.CDOTA_NPC_TechiesMines || x.ClassID == ClassID.CDOTA_NPC_Treant_EyesInTheForest)
-                        && x.Team != me.Team && GetDistance2D(x.NetworkPosition, me.NetworkPosition) < 450 &&
-                        x.IsVisible && x.IsAlive).FirstOrDefault();
+                         x.ClassID == ClassID.CDOTA_NPC_Observer_Ward_TrueSight || x.ClassID == ClassID.CDOTA_NPC_TechiesMines /*|| x.ClassID == ClassID.CDOTA_NPC_Treant_EyesInTheForest*/)
+                        && x.Team != me.Team && me.NetworkPosition.Distance2D(x.NetworkPosition) < 450 &&
+                        x.IsVisible && x.IsAlive);
             if (!me.IsChanneling() && Utils.SleepCheck("Use"))
             {
-                if (wards != null)
+                if (Things != null)
                 {
-                    uint i = 0;
-                    uint last_i = 100;
-                    string item_name = null;
-                    List<Item> me_inventory = me.Inventory.Items.ToList();
-                    items = new string[5] { "item_quelling_blade", "item_iron_talon", "item_bfury", "item_tango_single", "item_tango" };
-                    foreach (Item x in me_inventory)
+                    var useItem = items.Select(item => me.FindItem(item)).FirstOrDefault(x => x != null && x.CanBeCasted());
+                    if (useItem != null && !((useItem.Name == "item_tango_single" || useItem.Name == "item_tango") && Things.ClassID == ClassID.CDOTA_NPC_TechiesMines))
                     {
-                        for (i = 0; i < 5; i++)
-                        {
-                            if (items[i] == x.Name && x.Cooldown <= 0)
-                            {
-                                if (i <= last_i)
-                                {
-                                    item_name = x.Name;
-                                    last_i = i;
-                                }
-                            }
-                        }
+                        useItem.UseAbility(Things);
+                        Utils.Sleep(250, "Use");
                     }
-                    if (item_name != null && me.FindItem(item_name).CanBeCasted())
-                        me.FindItem(item_name).UseAbility(wards);
                     Utils.Sleep(250, "Use");
                 }
             }
-        }
-        private static float GetDistance2D(Vector3 p1, Vector3 p2)
-        {
-            return (float)Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
         }
         public static void PrintInfo(string text, params object[] arguments)
         {
