@@ -12,8 +12,10 @@ namespace Tinker_Perfect_type
     class Tinker_Perfect_type
     {
         private static Ability Laser, Rocket, Refresh, March;
-        private static Item Blink, Dagon, Hex, Soulring, Ethereal, Shiva, ghost, euls, forcestaff, glimmer;
+        private static Item Blink, Dagon, Hex, Soulring, Ethereal, Shiva, ghost, euls, forcestaff, glimmer, bottle, travel;
         private static Hero me, target;
+        private static Vector3 Radiant = new Vector3(-7472, -6938, 528), Dire = new Vector3(7472, 6192, 512);
+        private static int stage = 0;
         private static bool auto_attack, auto_attack_after_spell;
         private static readonly Menu Menu = new Menu("Tinker Perfect", "Tinker Perfect", true);
         private static readonly Menu _skills = new Menu("Skills", "Skills");
@@ -22,8 +24,8 @@ namespace Tinker_Perfect_type
             {
                 {"tinker_laser",true},
                 {"tinker_heat_seeking_missile",true},
-                {"tinker_rearm",true}
-                //{"tinker_march_of_the_machines",true}
+                {"tinker_rearm",true},
+                {"tinker_march_of_the_machines",true}
             };
         private static readonly Dictionary<string, bool> Items = new Dictionary<string, bool>
             {
@@ -39,6 +41,7 @@ namespace Tinker_Perfect_type
                 {"item_ghost",true},
                 {"item_cyclone",true},
                 {"item_force_staff",true},
+                {"item_bottle",true},
                 {"item_glimmer_cape",true}
             };
 
@@ -46,6 +49,7 @@ namespace Tinker_Perfect_type
         {
             // Menu Options
             Menu.AddItem(new MenuItem("Combo Key", "Combo Key").SetValue(new KeyBind('D', KeyBindType.Press)));
+            Menu.AddItem(new MenuItem("Farm Key", "Farm Key").SetValue(new KeyBind('F', KeyBindType.Press)));
             Menu.AddSubMenu(_skills);
             Menu.AddSubMenu(_items);
             _skills.AddItem(new MenuItem("Skills: ", "Skills: ").SetValue(new AbilityToggler(Skills)));
@@ -75,6 +79,72 @@ namespace Tinker_Perfect_type
                 return;
             if (me.ClassID != ClassID.CDOTA_Unit_Hero_Tinker)
                 return;
+            //Console.WriteLine(me.Inventory.Items.LastOrDefault().Name);
+            if ((Game.IsKeyDown(Menu.Item("Farm Key").GetValue<KeyBind>().Key)) && !Game.IsChatOpen)
+            {
+                FindItems();
+                autoattack(true);
+                Vector3 POSMARCH = (Game.MousePosition - me.NetworkPosition) * 10 / Game.MousePosition.Distance2D(me.NetworkPosition) + me.NetworkPosition;
+                if (stage == 0 && Utils.SleepCheck("stage 0"))
+                {
+                    if (ghost != null && ghost.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name))
+                        ghost.UseAbility(false);
+                    if (Soulring != null && Soulring.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
+                        Soulring.UseAbility(false);
+                    if (bottle != null && bottle.CanBeCasted() && !me.IsChanneling() && !me.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration") && bottle.CurrentCharges >= 0 && Utils.SleepCheck("bottle_CD") && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(bottle.Name))
+                    {
+                        bottle.UseAbility(false);
+                        Utils.Sleep(1000, "bottle_CD");
+                    }
+                    if (March != null && March.CanBeCasted() && !me.IsChanneling() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name) && me.Mana >= March.ManaCost + 75)
+                        March.UseAbility(POSMARCH, false);
+                    if ((Soulring == null || !Soulring.CanBeCasted() || !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)) && (!March.CanBeCasted() || March.Level <= 0 || me.Mana <= March.ManaCost + 75 || !Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name)) && (Refresh.Level >= 0 && Refresh.CanBeCasted()) && !me.IsChanneling() && Utils.SleepCheck("REFRESHEEER") && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name))
+                    {
+                        Refresh.UseAbility(false);
+                        Utils.Sleep(750, "REFRESHEEER");
+                    }
+                    if (Refresh.IsChanneling)
+                    {
+                        stage = 1;
+                        Utils.Sleep(5000, "CD_COMBO_FARM");
+                    }
+                    Utils.Sleep(400, "stage 0");
+                }
+                if (stage == 1 && Utils.SleepCheck("stage 1"))
+                {
+                    if (ghost != null && ghost.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name))
+                        ghost.UseAbility(false);
+                    if (Soulring != null && Soulring.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
+                        Soulring.UseAbility();
+                    if (bottle != null && bottle.CanBeCasted() && !me.IsChanneling() && !me.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration") && bottle.CurrentCharges >= 0 && Utils.SleepCheck("bottle_CD"))
+                    {
+                        bottle.UseAbility();
+                        Utils.Sleep(1000, "bottle_CD");
+                    }
+                    if (March != null && March.CanBeCasted() && !me.IsChanneling() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name) && me.Mana >= March.ManaCost + 75)
+                        March.UseAbility(POSMARCH);
+                    if((Soulring == null || !Soulring.CanBeCasted() || !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)) && (!March.CanBeCasted() || March.Level <= 0 || me.Mana <= March.ManaCost + 75 || !Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name)))
+                    {
+                        if (travel.CanBeCasted() && !me.IsChanneling())
+                        {
+                            if (me.Team == Team.Dire)
+                                travel.UseAbility(Dire);
+                            if (me.Team == Team.Radiant)
+                                travel.UseAbility(Radiant);
+                            Utils.Sleep(500, "FarmRefresh");
+                        }
+                        if (travel.IsChanneling)
+                            stage = 0;
+                    }
+                    Utils.Sleep(400, "stage 1");
+                }
+            }
+            else
+            {
+                autoattack(false);
+                if(Utils.SleepCheck("CD_COMBO_FARM") && Utils.SleepCheck("stage 1") && Utils.SleepCheck("stage 0"))
+                    stage = 0;
+            }
             if ((Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key)) && !Game.IsChatOpen)
             {
                 target = me.ClosestToMouseTarget(1000);
@@ -215,11 +285,11 @@ namespace Tinker_Perfect_type
         }
         static void autoattack(bool key)
         {
-            if(key)
+            if (key)
             {
-                if(auto_attack)
+                if (auto_attack)
                     Game.ExecuteCommand("dota_player_units_auto_attack 0");
-                if(auto_attack_after_spell)
+                if (auto_attack_after_spell)
                     Game.ExecuteCommand("dota_player_units_auto_attack_after_spell 0");
             }
             else
@@ -266,6 +336,8 @@ namespace Tinker_Perfect_type
             euls = me.FindItem("item_cyclone");
             forcestaff = me.FindItem("item_force_staff");
             glimmer = me.FindItem("item_glimmer_cape");
+            bottle = me.FindItem("item_bottle");
+            travel = me.Inventory.Items.FirstOrDefault(item => item.Name.Contains("item_travel_boots"));
         }
         static Vector2 HeroPositionOnScreen(Hero x)
         {
@@ -273,19 +345,19 @@ namespace Tinker_Perfect_type
             float scaleY = HUDInfo.ScreenSizeY();
             Vector2 PicPosition;
             Drawing.WorldToScreen(x.Position, out PicPosition);
-            PicPosition = new Vector2((float)(PicPosition.X + (scaleX * -0.035)),(float)((PicPosition.Y) + (scaleY * -0.10)));
+            PicPosition = new Vector2((float)(PicPosition.X + (scaleX * -0.035)), (float)((PicPosition.Y) + (scaleY * -0.10)));
             return PicPosition;
         }
         static bool Ready_for_refresh()
         {
-            if ((ghost != null && ghost.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name)) 
-                || (Soulring != null && Soulring.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)) 
-                || (Hex != null && Hex.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Hex.Name)) 
-                || (Laser != null && Laser.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Laser.Name)) 
-                || (Ethereal != null && Ethereal.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Ethereal.Name)) 
-                || (Dagon != null && Dagon.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_dagon")) 
-                || (Rocket != null && Rocket.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Rocket.Name)) 
-                || (Shiva != null && Shiva.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Shiva.Name)) 
+            if ((ghost != null && ghost.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name))
+                || (Soulring != null && Soulring.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
+                || (Hex != null && Hex.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Hex.Name))
+                || (Laser != null && Laser.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Laser.Name))
+                || (Ethereal != null && Ethereal.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Ethereal.Name))
+                || (Dagon != null && Dagon.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_dagon"))
+                || (Rocket != null && Rocket.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Rocket.Name))
+                || (Shiva != null && Shiva.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Shiva.Name))
                 || (euls != null && euls.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(euls.Name))
                 || (glimmer != null && glimmer.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(glimmer.Name)))
                 return false;
