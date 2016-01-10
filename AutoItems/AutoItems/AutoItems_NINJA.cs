@@ -42,14 +42,11 @@ namespace AutoItems
             me = ObjectMgr.LocalHero;
             if (me == null)
                 return;
-            if (me.IsAlive && (!me.IsInvisible() || me.ClassID == ClassID.CDOTA_Unit_Hero_Riki) && !me.IsChanneling() && Utils.SleepCheck("AutoItems"))
+            if (me.IsAlive)
             {
-                item_bottle = me.FindItem("item_bottle");
-                item_phase_boots = me.FindItem("item_phase_boots");
-                item_magic_stick = me.FindItem("item_magic_stick");
-                item_magic_wand = me.FindItem("item_magic_wand");
+                FindItems();
                 PercentStickUse = ((double)Menu.Item("Percent Configuration").GetValue<Slider>().Value / 100);
-                if (item_bottle != null && me.Modifiers.Any(x => x.Name == "modifier_fountain_aura_buff") && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_bottle.Name) && Utils.SleepCheck("bottle"))
+                if ( item_bottle != null && (!me.IsInvisible() || me.ClassID == ClassID.CDOTA_Unit_Hero_Riki) && !me.IsChanneling() && me.Modifiers.Any(x => x.Name == "modifier_fountain_aura_buff") && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_bottle.Name) && Utils.SleepCheck("bottle"))
                 {
                     if(!me.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration") && (me.Health < me.MaximumHealth || me.Mana < me.MaximumMana))
                         item_bottle.UseAbility(false);
@@ -59,16 +56,26 @@ namespace AutoItems
                             item_bottle.UseAbility(v,false);
                     Utils.Sleep(300, "bottle");
                 }
-                if (item_phase_boots != null && item_phase_boots.CanBeCasted() && me.NetworkActivity == NetworkActivity.Move && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_phase_boots.Name) && Utils.SleepCheck("phaseboots"))
+                if (item_phase_boots != null && (!me.IsInvisible() || me.ClassID == ClassID.CDOTA_Unit_Hero_Riki) && !me.IsChanneling() && item_phase_boots.CanBeCasted() && me.NetworkActivity == NetworkActivity.Move && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_phase_boots.Name) && Utils.SleepCheck("phaseboots"))
                 {
                     item_phase_boots.UseAbility(false);
                     Utils.Sleep(300, "phaseboots");
                 }
-                if (item_magic_stick != null && item_magic_stick.CanBeCasted() && item_magic_stick.CurrentCharges > 0 && (double)me.Health / me.MaximumHealth < PercentStickUse && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_magic_stick.Name))
+                if (item_magic_stick != null && (!me.IsInvisible() || me.ClassID == ClassID.CDOTA_Unit_Hero_Riki) && !me.IsChanneling() && item_magic_stick.CanBeCasted() && item_magic_stick.CurrentCharges > 0 && (double)me.Health / me.MaximumHealth < PercentStickUse && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_magic_stick.Name))
                     item_magic_stick.UseAbility(false);
-                if (item_magic_wand != null && item_magic_wand.CanBeCasted() && item_magic_wand.CurrentCharges > 0 && (double)me.Health / me.MaximumHealth < PercentStickUse && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_magic_wand.Name))
+                if (item_magic_wand != null && (!me.IsInvisible() || me.ClassID == ClassID.CDOTA_Unit_Hero_Riki) && !me.IsChanneling() &&  item_magic_wand.CanBeCasted() && item_magic_wand.CurrentCharges > 0 && (double)me.Health / me.MaximumHealth < PercentStickUse && _item_config.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(item_magic_wand.Name))
                     item_magic_wand.UseAbility(false);
-                Utils.Sleep(800, "AutoItems");
+            }
+        }
+        static void FindItems()
+        {
+            if (Utils.SleepCheck("Finditems"))
+            {
+                item_bottle = me.FindItem("item_bottle");
+                item_phase_boots = me.FindItem("item_phase_boots");
+                item_magic_stick = me.FindItem("item_magic_stick");
+                item_magic_wand = me.FindItem("item_magic_wand");
+                Utils.Sleep(500, "Finditems");
             }
         }
         private static void PrintSuccess(string text, params object[] arguments)

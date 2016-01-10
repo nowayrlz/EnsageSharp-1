@@ -79,13 +79,12 @@ namespace Tinker_Perfect_type
                 return;
             if (me.ClassID != ClassID.CDOTA_Unit_Hero_Tinker)
                 return;
-            //Console.WriteLine(me.Inventory.Items.LastOrDefault().Name);
-            if ((Game.IsKeyDown(Menu.Item("Farm Key").GetValue<KeyBind>().Key)) && !Game.IsChatOpen)
+            if ((Game.IsKeyDown(Menu.Item("Farm Key").GetValue<KeyBind>().Key)) && !Game.IsChatOpen || (!Utils.SleepCheck("InCombo") && Refresh.IsChanneling))
             {
                 FindItems();
                 autoattack(true);
                 Vector3 POSMARCH = (Game.MousePosition - me.NetworkPosition) * 10 / Game.MousePosition.Distance2D(me.NetworkPosition) + me.NetworkPosition;
-                if (stage == 0 && Utils.SleepCheck("stage 0"))
+                if (stage == 0)
                 {
                     if (ghost != null && ghost.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name))
                         ghost.UseAbility(false);
@@ -108,9 +107,11 @@ namespace Tinker_Perfect_type
                         stage = 1;
                         Utils.Sleep(5000, "CD_COMBO_FARM");
                     }
-                    Utils.Sleep(400, "stage 0");
+                    if (me.Mana <= Refresh.ManaCost)
+                        stage = 1;
+                    Utils.Sleep(500, "InCombo");
                 }
-                if (stage == 1 && Utils.SleepCheck("stage 1"))
+                if (stage == 1)
                 {
                     if (ghost != null && ghost.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name))
                         ghost.UseAbility(false);
@@ -123,7 +124,7 @@ namespace Tinker_Perfect_type
                     }
                     if (March != null && March.CanBeCasted() && !me.IsChanneling() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name) && me.Mana >= March.ManaCost + 75)
                         March.UseAbility(POSMARCH);
-                    if((Soulring == null || !Soulring.CanBeCasted() || !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)) && (!March.CanBeCasted() || March.Level <= 0 || me.Mana <= March.ManaCost + 75 || !Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name)))
+                    if ((Soulring == null || !Soulring.CanBeCasted() || !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)) && (!March.CanBeCasted() || March.Level <= 0 || me.Mana <= March.ManaCost + 75 || !Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name)))
                     {
                         if (travel.CanBeCasted() && !me.IsChanneling())
                         {
@@ -136,13 +137,12 @@ namespace Tinker_Perfect_type
                         if (travel.IsChanneling)
                             stage = 0;
                     }
-                    Utils.Sleep(400, "stage 1");
                 }
             }
             else
             {
                 autoattack(false);
-                if(Utils.SleepCheck("CD_COMBO_FARM") && Utils.SleepCheck("stage 1") && Utils.SleepCheck("stage 0"))
+                if (Utils.SleepCheck("CD_COMBO_FARM"))
                     stage = 0;
             }
             if ((Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key)) && !Game.IsChatOpen)
@@ -208,9 +208,9 @@ namespace Tinker_Perfect_type
                     {
                         uint elsecount = 0;
                         bool magicimune = (!target.IsMagicImmune() && !target.Modifiers.Any(x => x.Name == "modifier_eul_cyclone"));
-                        if (Utils.SleepCheck("combo"))
+                        // glimmer -> ghost -> soulring -> hex -> laser -> ethereal -> dagon -> rocket -> shivas -> euls -> refresh
+                        if (Utils.SleepCheck("FastCombo"))
                         {
-                            // glimmer -> ghost -> soulring -> hex -> laser -> ethereal -> dagon -> rocket -> shivas -> euls -> refresh
                             if (glimmer != null && glimmer.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(glimmer.Name) && Utils.SleepCheck("Rearm"))
                                 glimmer.UseAbility(me);
                             else
@@ -235,11 +235,14 @@ namespace Tinker_Perfect_type
                             {
                                 Ethereal.UseAbility(target);
                                 if (Utils.SleepCheck("EtherealTime") && me.Distance2D(target) <= Ethereal.CastRange)
-                                    Utils.Sleep((me.NetworkPosition.Distance2D(target.NetworkPosition) / 620) * 1000, "EtherealTime");
+                                {
+                                    Utils.Sleep(((me.NetworkPosition.Distance2D(target.NetworkPosition) / 1200) * 1000) + 100, "EtherealTime");
+                                    Utils.Sleep(((me.NetworkPosition.Distance2D(target.NetworkPosition) / 1200) * 1000) + 600, "EtherealTime2");
+                                }
                             }
                             else
                                 elsecount += 1;
-                            if (Dagon != null && Dagon.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_dagon") && magicimune && Utils.SleepCheck("Rearm") && Utils.SleepCheck("EtherealTime"))
+                            if (Dagon != null && Dagon.CanBeCasted() && !Ethereal.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_dagon") && magicimune && Utils.SleepCheck("Rearm") && Utils.SleepCheck("EtherealTime"))
                                 Dagon.UseAbility(target);
                             else
                                 elsecount += 1;
@@ -247,7 +250,10 @@ namespace Tinker_Perfect_type
                             {
                                 Rocket.UseAbility();
                                 if (Utils.SleepCheck("RocketTime") && me.Distance2D(target) <= Rocket.CastRange)
-                                    Utils.Sleep((me.NetworkPosition.Distance2D(target.NetworkPosition) / 600) * 1000, "RocketTime");
+                                {
+                                    Utils.Sleep(((me.NetworkPosition.Distance2D(target.NetworkPosition) / 900) * 1000) + 100, "RocketTime");
+                                    Utils.Sleep(((me.NetworkPosition.Distance2D(target.NetworkPosition) / 900) * 1000) + 600, "RocketTime2");
+                                }
                             }
                             else
                                 elsecount += 1;
@@ -255,21 +261,21 @@ namespace Tinker_Perfect_type
                                 Shiva.UseAbility();
                             else
                                 elsecount += 1;
-                            if (elsecount == 9 && euls != null && euls.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(euls.Name) && magicimune && Utils.SleepCheck("Rearm") && Utils.SleepCheck("EtherealTime") && Utils.SleepCheck("RocketTime"))
+                            if (elsecount == 9 && euls != null && euls.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(euls.Name) && magicimune && Utils.SleepCheck("Rearm") && Utils.SleepCheck("EtherealTime2") && Utils.SleepCheck("RocketTime2"))
                                 euls.UseAbility(target);
                             else
                                 elsecount += 1;
-                            if (elsecount == 10 && Refresh != null && Refresh.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name) && !Refresh.IsChanneling && Utils.SleepCheck("Rearm") && Ready_for_refresh())
-                            {
-                                Refresh.UseAbility();
-                                Utils.Sleep(800, "Rearm");
-                            }
-                            else
-                            {
-                                if (!me.IsChanneling() && Utils.SleepCheck("Rearm") && me.Distance2D(target) <= me.AttackRange)
-                                    me.Attack(target);
-                            }
-                            Utils.Sleep(150, "combo");
+                            Utils.Sleep(150, "FastCombo");
+                        }
+                        if (elsecount == 10 && Refresh != null && Refresh.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name) && !Refresh.IsChanneling && Utils.SleepCheck("Rearm") && Ready_for_refresh())
+                        {
+                            Refresh.UseAbility();
+                            Utils.Sleep(800, "Rearm");
+                        }
+                        else
+                        {
+                            if (!me.IsChanneling() && me.CanAttack() && Utils.SleepCheck("Rearm") && me.Distance2D(target) <= me.AttackRange)
+                                me.Attack(target);
                         }
                     }
                 }
