@@ -84,23 +84,32 @@ namespace Tinker_Perfect_type
                 FindItems();
                 autoattack(true);
                 Vector3 POSMARCH = (Game.MousePosition - me.NetworkPosition) * 10 / Game.MousePosition.Distance2D(me.NetworkPosition) + me.NetworkPosition;
-                if (stage == 0)
+                if (stage == 0 && Utils.SleepCheck("FarmRefresh"))
                 {
-                    if (ghost != null && ghost.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name))
+                    if (ghost != null && ghost.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name) && Utils.SleepCheck("ghost_usage") && Utils.SleepCheck("REFRESHEEER"))
+                    {
                         ghost.UseAbility(false);
-                    if (Soulring != null && Soulring.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
+                        Utils.Sleep(600, "ghost_usage");
+                    }
+                    if (Soulring != null && Soulring.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name) && Utils.SleepCheck("soul_ring_usage") && Utils.SleepCheck("REFRESHEEER"))
+                    {
                         Soulring.UseAbility(false);
-                    if (bottle != null && bottle.CanBeCasted() && !me.IsChanneling() && !me.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration") && bottle.CurrentCharges >= 0 && Utils.SleepCheck("bottle_CD") && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(bottle.Name))
+                        Utils.Sleep(600, "soul_ring_usage");
+                    }
+                    if (bottle != null && bottle.CanBeCasted() && !me.IsChanneling() && !me.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration") && bottle.CurrentCharges >= 0 && Utils.SleepCheck("bottle_CD") && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(bottle.Name) && Utils.SleepCheck("REFRESHEEER"))
                     {
                         bottle.UseAbility(false);
                         Utils.Sleep(1000, "bottle_CD");
                     }
-                    if (March != null && March.CanBeCasted() && !me.IsChanneling() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name) && me.Mana >= March.ManaCost + 75)
+                    if (March != null && March.CanBeCasted() && !me.IsChanneling() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name) && me.Mana >= March.ManaCost + 75 && Utils.SleepCheck("MarchUsage"))
+                    {
                         March.UseAbility(POSMARCH, false);
+                        Utils.Sleep(800, "MarchUsage");
+                    }
                     if ((Soulring == null || !Soulring.CanBeCasted() || !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)) && (!March.CanBeCasted() || March.Level <= 0 || me.Mana <= March.ManaCost + 75 || !Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name)) && (Refresh.Level >= 0 && Refresh.CanBeCasted()) && !me.IsChanneling() && Utils.SleepCheck("REFRESHEEER") && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name))
                     {
                         Refresh.UseAbility(false);
-                        Utils.Sleep(750, "REFRESHEEER");
+                        Utils.Sleep(900, "REFRESHEEER");
                     }
                     if (Refresh.IsChanneling)
                     {
@@ -111,20 +120,29 @@ namespace Tinker_Perfect_type
                         stage = 1;
                     Utils.Sleep(500, "InCombo");
                 }
-                if (stage == 1)
+                if (stage == 1 && Utils.SleepCheck("FarmRefresh"))
                 {
-                    if (ghost != null && ghost.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name))
+                    if (ghost != null && ghost.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name) && Utils.SleepCheck("REFRESHEEER") && Utils.SleepCheck("ghost_usage"))
+                    {
                         ghost.UseAbility(false);
-                    if (Soulring != null && Soulring.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name))
-                        Soulring.UseAbility();
-                    if (bottle != null && bottle.CanBeCasted() && !me.IsChanneling() && !me.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration") && bottle.CurrentCharges >= 0 && Utils.SleepCheck("bottle_CD"))
+                        Utils.Sleep(600, "ghost_usage");
+                    }
+                    if (Soulring != null && Soulring.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name) && Utils.SleepCheck("REFRESHEEER") && Utils.SleepCheck("soul_ring_usage"))
+                    {
+                        Soulring.UseAbility(false);
+                        Utils.Sleep(600, "soul_ring_usage");
+                    }
+                    if (bottle != null && bottle.CanBeCasted() && !me.IsChanneling() && !me.Modifiers.Any(x => x.Name == "modifier_bottle_regeneration") && bottle.CurrentCharges >= 0 && Utils.SleepCheck("bottle_CD") && Utils.SleepCheck("REFRESHEEER"))
                     {
                         bottle.UseAbility();
                         Utils.Sleep(1000, "bottle_CD");
                     }
-                    if (March != null && March.CanBeCasted() && !me.IsChanneling() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name) && me.Mana >= March.ManaCost + 75)
+                    if (March != null && March.CanBeCasted() && !me.IsChanneling() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name) && me.Mana >= March.ManaCost + 75 && Utils.SleepCheck("REFRESHEEER") && Utils.SleepCheck("MarchUsage"))
+                    {
                         March.UseAbility(POSMARCH);
-                    if ((Soulring == null || !Soulring.CanBeCasted() || !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)) && (!March.CanBeCasted() || March.Level <= 0 || me.Mana <= March.ManaCost + 75 || !Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name)))
+                        Utils.Sleep(800, "MarchUsage");
+                    }
+                    if ((Soulring == null || !Soulring.CanBeCasted() || !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Soulring.Name)) && (!March.CanBeCasted() || March.Level <= 0 || me.Mana <= March.ManaCost + 75 || !Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(March.Name)) && Utils.SleepCheck("REFRESHEEER"))
                     {
                         if (travel.CanBeCasted() && !me.IsChanneling())
                         {
@@ -176,7 +194,7 @@ namespace Tinker_Perfect_type
                             {
                                 Ethereal.UseAbility(target);
                                 Utils.Sleep(200, "TimingToLinkens");
-                                Utils.Sleep((me.NetworkPosition.Distance2D(target.NetworkPosition) / 650) * 1000, "TimingToLinkens");
+                                Utils.Sleep((1200 / me.NetworkPosition.Distance2D(target.NetworkPosition)) * 1000, "TimingToLinkens");
                             }
                         }
                         else if (Laser != null && Laser.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Laser.Name))
@@ -236,8 +254,8 @@ namespace Tinker_Perfect_type
                                 Ethereal.UseAbility(target);
                                 if (Utils.SleepCheck("EtherealTime") && me.Distance2D(target) <= Ethereal.CastRange)
                                 {
-                                    Utils.Sleep(((me.NetworkPosition.Distance2D(target.NetworkPosition) / 1200) * 1000) + 100, "EtherealTime");
-                                    Utils.Sleep(((me.NetworkPosition.Distance2D(target.NetworkPosition) / 1200) * 1000) + 600, "EtherealTime2");
+                                    Utils.Sleep(((me.NetworkPosition.Distance2D(target.NetworkPosition) / 1200) * 1000), "EtherealTime");
+                                    Utils.Sleep(((me.NetworkPosition.Distance2D(target.NetworkPosition) / 1200) * 1000) + 200, "EtherealTime2");
                                 }
                             }
                             else
@@ -251,8 +269,8 @@ namespace Tinker_Perfect_type
                                 Rocket.UseAbility();
                                 if (Utils.SleepCheck("RocketTime") && me.Distance2D(target) <= Rocket.CastRange)
                                 {
-                                    Utils.Sleep(((me.NetworkPosition.Distance2D(target.NetworkPosition) / 900) * 1000) + 100, "RocketTime");
-                                    Utils.Sleep(((me.NetworkPosition.Distance2D(target.NetworkPosition) / 900) * 1000) + 600, "RocketTime2");
+                                    Utils.Sleep(((me.NetworkPosition.Distance2D(target.NetworkPosition) / 900) * 1000), "RocketTime");
+                                    Utils.Sleep(((me.NetworkPosition.Distance2D(target.NetworkPosition) / 900) * 1000) + 200, "RocketTime2");
                                 }
                             }
                             else
@@ -265,12 +283,12 @@ namespace Tinker_Perfect_type
                                 euls.UseAbility(target);
                             else
                                 elsecount += 1;
-                            Utils.Sleep(150, "FastCombo");
+                            Utils.Sleep(250, "FastCombo");
                         }
                         if (elsecount == 10 && Refresh != null && Refresh.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Refresh.Name) && !Refresh.IsChanneling && Utils.SleepCheck("Rearm") && Ready_for_refresh())
                         {
                             Refresh.UseAbility();
-                            Utils.Sleep(800, "Rearm");
+                            Utils.Sleep(1000, "Rearm");
                         }
                         else
                         {
