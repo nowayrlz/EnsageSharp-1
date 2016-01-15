@@ -92,7 +92,7 @@ namespace Tinker_Perfect_type
                 Vector3 POSMARCH = (Game.MousePosition - me.NetworkPosition) * 10 / Game.MousePosition.Distance2D(me.NetworkPosition) + me.NetworkPosition;
                 if (stage == 0 && Utils.SleepCheck("FarmRefresh"))
                 {
-                    if (Blink != null && Blink.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name) && Utils.SleepCheck("REFRESHEER") && !Refresh.IsChanneling && Utils.SleepCheck("blink") && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_blink"))
+                    if (Blink != null && Blink.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name) && Utils.SleepCheck("REFRESHEER") && !Refresh.IsChanneling && Utils.SleepCheck("blink") && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_blink") && !me.IsChanneling())
                     {
                         Blink.UseAbility(Game.MousePosition);
                         Utils.Sleep(100 - Game.Ping, "blink");
@@ -133,10 +133,10 @@ namespace Tinker_Perfect_type
                 }
                 if (stage == 1 && Utils.SleepCheck("FarmRefresh"))
                 {
-                    if (Blink != null && Blink.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name) && Utils.SleepCheck("REFRESHEER") && !Refresh.IsChanneling && Utils.SleepCheck("blink") && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_blink"))
+                    if (Blink != null && Blink.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name) && Utils.SleepCheck("REFRESHEER") && !Refresh.IsChanneling && Utils.SleepCheck("blink") && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_blink") && !me.IsChanneling())
                     {
                         Blink.UseAbility(Game.MousePosition);
-                        Utils.Sleep(100 - Game.Ping, "blink");
+                        Utils.Sleep(300 - Game.Ping, "blink");
                     }
                     if (ghost != null && ghost.CanBeCasted() && !me.IsChanneling() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name) && Utils.SleepCheck("REFRESHEEER") && Utils.SleepCheck("ghost_usage"))
                     {
@@ -243,10 +243,10 @@ namespace Tinker_Perfect_type
                         uint elsecount = 0;
                         bool magicimune = (!target.IsMagicImmune() && !target.Modifiers.Any(x => x.Name == "modifier_eul_cyclone"));
                         // glimmer -> ghost -> soulring -> hex -> laser -> ethereal -> dagon -> rocket -> shivas -> euls -> refresh
-                        if(Blink != null && Blink.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name) && Utils.SleepCheck("Rearm") && !Refresh.IsChanneling && Utils.SleepCheck("blink") && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_blink"))
+                        if(Blink != null && Blink.CanBeCasted() && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(Blink.Name) && Utils.SleepCheck("Rearm") && !Refresh.IsChanneling && Utils.SleepCheck("blink") && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_blink") && !me.IsChanneling())
                         {
                             Blink.UseAbility(Game.MousePosition);
-                            Utils.Sleep(100 - Game.Ping, "blink");
+                            Utils.Sleep(300 - Game.Ping, "blink");
                         }
                         if (glimmer != null && glimmer.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(glimmer.Name) && Utils.SleepCheck("Rearm") && !Refresh.IsChanneling && Utils.SleepCheck("glimmer"))
                         {
@@ -385,7 +385,6 @@ namespace Tinker_Perfect_type
             }
             if (!Utils.SleepCheck("BLINKTOGGLE"))
                 Drawing.DrawText(Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_blink") == true ? "BLINK ON" : "BLINK OFF", new Vector2(HUDInfo.ScreenSizeX() / 2, HUDInfo.ScreenSizeY() / 2), new Vector2(30, 200), Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled("item_blink") == true ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
-
         }
         static void FindItems()
         {
