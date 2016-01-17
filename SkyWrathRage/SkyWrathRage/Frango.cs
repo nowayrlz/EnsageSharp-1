@@ -105,7 +105,7 @@ namespace SkyWrathRage
             {
                 FindItems();
                 target = me.ClosestToMouseTarget(1200);
-                if (target != null && target.IsValid && target.IsVisible && !target.IsIllusion && target.IsAlive && !me.IsChanneling())
+                if (target != null && target.IsValid && target.IsVisible && !target.IsIllusion && target.IsAlive && !me.IsChanneling() && !target.IsInvul())
                 {
                     autoattack(true);
                     if (target.IsLinkensProtected())
