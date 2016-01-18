@@ -14,9 +14,11 @@ namespace Enigma
         private static readonly Menu Menu = new Menu("Enigma", "Enigma", true);
         private static readonly Menu Menu_Items = new Menu("Items: ", "Items: ");
         private static Ability midnightpulse, blackhole;
-        private static Item blink, bkb, veil, shivas, refresher;
+        private static Item blink, bkb, veil, shivas, refresher, glimmer;
+        private static ParticleEffect particleEffect;
         private static Hero me, target;
         private static Vector3 mousepos;
+        private static bool SafeBlackHole;
         private static readonly Dictionary<string, bool> items = new Dictionary<string, bool>
             {
                 {"item_blink",true},
@@ -24,6 +26,7 @@ namespace Enigma
                 {"item_black_king_bar",true},
                 {"item_shivas_guard",true},
                 {"item_refresher",true},
+                {"item_glimmer_cape",true},
             };
         private static readonly Dictionary<string, bool> Skills = new Dictionary<string, bool>
             {
@@ -33,6 +36,7 @@ namespace Enigma
         static void Main(string[] args)
         {
             Menu.AddItem(new MenuItem("Black Hole Key!", "Black Hole Key!").SetValue(new KeyBind('D', KeyBindType.Press)));
+            Menu.AddItem(new MenuItem("Safe Black Hole", "Safe Black Hole").SetValue(true).SetTooltip("Black Hole only will be used if there's enemies in area."));
             Menu.AddSubMenu(Menu_Items);
             Menu_Items.AddItem(new MenuItem("Items: ", "Items: ").SetValue(new AbilityToggler(items)));
             Menu_Items.AddItem(new MenuItem("Skills: ", "Skills: ").SetValue(new AbilityToggler(Skills)));
@@ -53,14 +57,24 @@ namespace Enigma
                 if (me.CanCast() && !me.IsChanneling())
                 {
                     mousepos = Game.MousePosition;
-                    if (me.Distance2D(mousepos) <= ((blink != null && blink.CanBeCasted()) ? (1200 + blackhole.CastRange) : blackhole.CastRange))
+                    if (me.Distance2D(mousepos) <= ((blink != null /*&& blink.CanBeCasted()*/) ? (1200 + blackhole.CastRange) : blackhole.CastRange))
                     {
                         if (Utils.SleepCheck("blackhole"))
                         {
+                            if((glimmer != null && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(glimmer.Name)) && glimmer.CanBeCasted() && Utils.SleepCheck("glimmer") && blackhole.CanBeCasted() && me.Mana > blackhole.ManaCost + glimmer.ManaCost)
+                            {
+                                glimmer.UseAbility(me,false);
+                                Utils.Sleep(200, "glimmer");
+                            }
                             if (!blackhole.CanBeCasted() && blackhole.Level > 0 && (refresher != null && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(refresher.Name)) && refresher.CanBeCasted() && Utils.SleepCheck("refresher") && me.Mana > refresher.ManaCost + blackhole.ManaCost)
                             {
                                 refresher.UseAbility(false);
                                 Utils.Sleep(2000, "refresher");
+                            }
+                            if ((bkb != null && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(bkb.Name)) && bkb.CanBeCasted() && Utils.SleepCheck("bkb") && blackhole.CanBeCasted())
+                            {
+                                bkb.UseAbility(false);
+                                Utils.Sleep(200, "bkb");
                             }
                             if ((blink != null && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(blink.Name)) && blink.CanBeCasted() && Utils.SleepCheck("blink") && me.Distance2D(mousepos) >= blackhole.CastRange && blackhole.CanBeCasted())
                             {
@@ -77,11 +91,6 @@ namespace Enigma
                                 midnightpulse.UseAbility(mousepos, false);
                                 Utils.Sleep(200, "pulse");
                             }
-                            if ((bkb != null && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(bkb.Name)) && bkb.CanBeCasted() && Utils.SleepCheck("bkb") && blackhole.CanBeCasted())
-                            {
-                                bkb.UseAbility(false);
-                                Utils.Sleep(200, "bkb");
-                            }
                             if ((shivas != null && Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(shivas.Name)) && shivas.CanBeCasted() && Utils.SleepCheck("shivas") && me.Mana > shivas.ManaCost + blackhole.ManaCost && blackhole.CanBeCasted())
                             {
                                 shivas.UseAbility(false);
@@ -90,7 +99,19 @@ namespace Enigma
                         }
                         if ((!blink.CanBeCasted() || me.Distance2D(mousepos) <= blackhole.CastRange || (blink != null && !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(blink.Name))) && (!veil.CanBeCasted() || me.Mana < veil.ManaCost + blackhole.ManaCost || (veil != null && !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(veil.Name))) && (!midnightpulse.CanBeCasted() || me.Mana < midnightpulse.ManaCost + blackhole.ManaCost || (midnightpulse != null && !Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(midnightpulse.Name))) && (!bkb.CanBeCasted() || (bkb != null && !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(bkb.Name))) && (!shivas.CanBeCasted() || me.Mana < shivas.ManaCost + blackhole.ManaCost ||(shivas != null && !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(shivas.Name))))
                         {
-                            if ((blackhole != null && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(blackhole.Name)) && blackhole.CanBeCasted() && Utils.SleepCheck("blackhole"))
+                            target = me.ClosestToMouseTarget(1000);
+                            if (Menu.Item("Safe Black Hole").GetValue<bool>())
+                            {
+                                if (target == null || !target.IsAlive || target.IsIllusion)
+                                    SafeBlackHole = false;
+                                else if (target.Distance2D(mousepos) > 420)
+                                    SafeBlackHole = false;
+                                else
+                                    SafeBlackHole = true;
+                            }
+                            else
+                                SafeBlackHole = true;
+                            if ((blackhole != null && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(blackhole.Name)) && blackhole.CanBeCasted() && Utils.SleepCheck("blackhole") && SafeBlackHole)
                             {
                                 blackhole.UseAbility(mousepos, false);
                                 Utils.Sleep(2000, "blackhole");
@@ -116,6 +137,7 @@ namespace Enigma
                 veil = me.FindItem("item_veil_of_discord");
                 shivas = me.FindItem("item_shivas_guard");
                 refresher = me.FindItem("item_refresher");
+                glimmer = me.FindItem("item_glimmer_cape");
                 midnightpulse = me.Spellbook.SpellE;
                 blackhole = me.Spellbook.SpellR;
                 Utils.Sleep(500, "FINDITEMS");
