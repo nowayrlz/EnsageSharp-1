@@ -6,6 +6,11 @@ using Ensage.Common.Extensions;
 using Ensage.Common;
 using SharpDX;
 using Ensage.Common.Menu;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using SharpDX.Direct3D9;
+using System.Globalization;
 
 namespace Enigma
 {
@@ -99,15 +104,13 @@ namespace Enigma
                         }
                         if ((!blink.CanBeCasted() || me.Distance2D(mousepos) <= blackhole.CastRange || (blink != null && !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(blink.Name))) && (!veil.CanBeCasted() || me.Mana < veil.ManaCost + blackhole.ManaCost || (veil != null && !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(veil.Name))) && (!midnightpulse.CanBeCasted() || me.Mana < midnightpulse.ManaCost + blackhole.ManaCost || (midnightpulse != null && !Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(midnightpulse.Name))) && (!bkb.CanBeCasted() || (bkb != null && !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(bkb.Name))) && (!shivas.CanBeCasted() || me.Mana < shivas.ManaCost + blackhole.ManaCost ||(shivas != null && !Menu.Item("Items: ").GetValue<AbilityToggler>().IsEnabled(shivas.Name))))
                         {
-                            target = me.ClosestToMouseTarget(1000);
+                            target = ObjectMgr.GetEntities<Hero>().FirstOrDefault(x => x.IsAlive && !x.IsIllusion && x.IsValid && x.NetworkPosition.Distance2D(mousepos) < 420 && x.Team != me.Team);
                             if (Menu.Item("Safe Black Hole").GetValue<bool>())
                             {
-                                if (target == null || !target.IsAlive || target.IsIllusion)
-                                    SafeBlackHole = false;
-                                else if (target.Distance2D(mousepos) > 420)
-                                    SafeBlackHole = false;
-                                else
+                                if (target != null)
                                     SafeBlackHole = true;
+                                else
+                                    SafeBlackHole = false;
                             }
                             else
                                 SafeBlackHole = true;
