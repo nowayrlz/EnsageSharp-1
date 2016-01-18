@@ -62,11 +62,12 @@ namespace SkyWrathRage
                 {"skywrath_mage_mystic_flare",true}
             };
         private static bool auto_attack, auto_attack_after_spell;
-        private static int[] bolt_damage = new int[4] { 60, 80, 100, 120};
+        private static int[] bolt_damage = new int[4] { 60, 80, 100, 120 };
         static void Main(string[] args)
         {
             Menu.AddItem(new MenuItem("Ultimate Key", "Ultimate Key").SetValue(new KeyBind('F', KeyBindType.Press)));
             Menu.AddItem(new MenuItem("Combo Key", "Combo Key").SetValue(new KeyBind('D', KeyBindType.Press)));
+            Menu.AddItem(new MenuItem("Chase Key", "Chase Key").SetValue(new KeyBind('T', KeyBindType.Press)));
             Menu.AddItem(new MenuItem("Soulring", "Soulring").SetValue(true).SetTooltip("Use soulring before use the combo if your HP is greater than 150."));
             Menu.AddSubMenu(_magic_items);
             Menu.AddSubMenu(_amplify_items);
@@ -101,6 +102,32 @@ namespace SkyWrathRage
             me = ObjectMgr.LocalHero;
             if (me == null || me.ClassID != ClassID.CDOTA_Unit_Hero_Skywrath_Mage)
                 return;
+            if (Game.IsKeyDown(Menu.Item("Chase Key").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
+            {
+                FindItems();
+                target = me.ClosestToMouseTarget();
+                if (target != null && target.IsValid && target.IsVisible && !target.IsIllusion && target.IsAlive && !me.IsChanneling() && !target.IsInvul())
+                {
+                    autoattack(true);
+                    if (Utils.SleepCheck("FASTCOMBO"))
+                    {
+                        if (bolt.Level > 0 && bolt.CanBeCasted() && !target.IsMagicImmune() && Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(bolt.Name))
+                        {
+                            bolt.UseAbility(target);
+                            Utils.Sleep(150, "FASTCOMBO");
+                        }
+                        else
+                            Orbwalking.Orbwalk(target);
+                    }
+                }
+                else
+                {
+                    if (!me.IsChanneling())
+                        me.Move(Game.MousePosition, false);
+                }
+            }
+            else
+                autoattack(false);
             if (Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
             {
                 FindItems();
@@ -197,20 +224,20 @@ namespace SkyWrathRage
                                 bolt.UseAbility(target);
                             else
                                 elsecount += 1;
-                            if (mysticflare.Level > 0 && mysticflare.CanBeCasted() && (Utils.SleepCheck("EtherealDelay") 
-                                && Utils.SleepCheck("SlowDelay") || target.UnitState.HasFlag(UnitState.Frozen) || target.UnitState.HasFlag(UnitState.Stunned) || target.MovementSpeed <= 280) 
-                                && !EzkillCheck && Utils.SleepCheck("MysticDamaging") 
-                                && (target.DamageTaken((int)(bolt_damage[bolt.Level - 1] + (me.TotalIntelligence * 1.6)),DamageType.Magical,me,false,0,0,0) * 2 <= target.Health 
-                                || me.Health <= (int)(me.MaximumHealth*0.35))
+                            if (mysticflare.Level > 0 && mysticflare.CanBeCasted() && (Utils.SleepCheck("EtherealDelay")
+                                && Utils.SleepCheck("SlowDelay") || target.UnitState.HasFlag(UnitState.Frozen) || target.UnitState.HasFlag(UnitState.Stunned) || target.MovementSpeed <= 280)
+                                && !EzkillCheck && Utils.SleepCheck("MysticDamaging")
+                                && (target.DamageTaken((int)(bolt_damage[bolt.Level - 1] + (me.TotalIntelligence * 1.6)), DamageType.Magical, me, false, 0, 0, 0) * 2 <= target.Health
+                                || me.Health <= (int)(me.MaximumHealth * 0.35))
                                 && (!atos.CanBeCasted() || atos == null | Menu.Item("Disable/slow Items").GetValue<AbilityToggler>().IsEnabled(atos.Name)) && (!slow.CanBeCasted() || !Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(slow.Name)) && (!ethereal.CanBeCasted() || ethereal == null | !Menu.Item("Magic Amplify Items").GetValue<AbilityToggler>().IsEnabled(ethereal.Name)) && !MagicImune && Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled("skywrath_mage_mystic_flare"))
                             {
                                 if (!target.CanMove() || target.NetworkActivity == NetworkActivity.Idle)
                                     mysticflare.UseAbility(target.NetworkPosition);
                                 else
-                                    mysticflare.UseAbility(Prediction.PredictedXYZ(target,(220 / target.MovementSpeed) * 1000));
-                                int[] mysticflaredamage = new int[3] { 600,1000,1400 };
-                                if(target.Health <= target.DamageTaken(mysticflaredamage[mysticflare.Level - 1], DamageType.Magical,me,false,0,0,0))
-                                    Utils.Sleep(2500,"MysticDamaging");
+                                    mysticflare.UseAbility(Prediction.PredictedXYZ(target, (220 / target.MovementSpeed) * 1000));
+                                int[] mysticflaredamage = new int[3] { 600, 1000, 1400 };
+                                if (target.Health <= target.DamageTaken(mysticflaredamage[mysticflare.Level - 1], DamageType.Magical, me, false, 0, 0, 0))
+                                    Utils.Sleep(2500, "MysticDamaging");
                             }
                             else
                                 elsecount += 1;
@@ -222,8 +249,8 @@ namespace SkyWrathRage
                 }
                 else
                 {
-                    if(!me.IsChanneling())
-                        me.Move(Game.MousePosition,false);
+                    if (!me.IsChanneling())
+                        me.Move(Game.MousePosition, false);
                 }
             }
             else
@@ -264,7 +291,7 @@ namespace SkyWrathRage
             if (target != null && target.IsAlive && target.IsValid)
             {
                 int alldamage = 0, percent = 0, orchidpercent = 0;
-                int[] dagondamage = new int[5] { 400,500,600,700,800 };
+                int[] dagondamage = new int[5] { 400, 500, 600, 700, 800 };
                 int etherealdamage = (int)(me.TotalIntelligence * 2) + 75;
                 if (orchid != null && orchid.CanBeCasted() && Menu.Item("Magic Amplify Items").GetValue<AbilityToggler>().IsEnabled(orchid.Name))
                     alldamage += 30;
