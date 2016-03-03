@@ -12,14 +12,15 @@ namespace Tinker_Perfect_type
     class Tinker_Perfect_type
     {
         private static Ability Laser, Rocket, Refresh, March;
-        private static Item Blink, Dagon, Hex, Soulring, Ethereal, Shiva, ghost, euls, forcestaff, glimmer, bottle, travel;
+        private static Item Blink, Dagon, Hex, Soulring, Ethereal, Shiva, ghost, euls, forcestaff, glimmer, bottle, travel, veil;
         private static Hero me, target;
-        private static Vector3 Radiant = new Vector3(-7472, -6938, 528), Dire = new Vector3(7472, 6192, 512);
-        private static int stage = 0;
+        //private static Vector3 Radiant = new Vector3(-7472, -6938, 528), Dire = new Vector3(7472, 6192, 512);
+        //private static int stage = 0;
         private static bool auto_attack, auto_attack_after_spell;
-        private static readonly Menu Menu = new Menu("Tinker Perfect", "Tinker Perfect", true);
+        private static readonly Menu Menu = new Menu("Tinker Perfect", "Tinker Perfect", true, "npc_dota_hero_tinker", true);
         private static readonly Menu _skills = new Menu("Skills", "Skills");
         private static readonly Menu _items = new Menu("Items", "Items");
+        private static readonly Menu _items2 = new Menu("Don't Use Combo on:", "Don't Use Combo on:");
         private static readonly Dictionary<string, bool> Skills = new Dictionary<string, bool>
             {
                 {"tinker_laser",true},
@@ -42,20 +43,29 @@ namespace Tinker_Perfect_type
                 {"item_cyclone",true},
                 {"item_force_staff",true},
                 //{"item_bottle",true},
-                {"item_glimmer_cape",true}
+                {"item_glimmer_cape",true},
+                {"item_veil_of_discord",true}
+            };
+        private static readonly Dictionary<string, bool> Items3 = new Dictionary<string, bool>
+            {
+                {"item_blade_mail",true},
+                {"item_lotus_orb",true}
             };
 
         static void Main(string[] args)
         {
             // Menu Options
             Menu.AddItem(new MenuItem("Combo Key", "Combo Key").SetValue(new KeyBind('D', KeyBindType.Press)));
+            Menu.AddItem(new MenuItem("Smart Blink", "Smart Blink").SetValue(new KeyBind('P', KeyBindType.Press)));
             //Menu.AddItem(new MenuItem("Farm Key", "Farm Key").SetValue(new KeyBind('F', KeyBindType.Press)));
             //Menu.AddItem(new MenuItem("Blink On/Off", "Blink On/Off").SetValue(new KeyBind('T', KeyBindType.Press)));
             Menu.AddSubMenu(_skills);
             Menu.AddSubMenu(_items);
+            Menu.AddSubMenu(_items2);
             _skills.AddItem(new MenuItem("Skills: ", "Skills: ").SetValue(new AbilityToggler(Skills)));
             _items.AddItem(new MenuItem("Items: ", "Items 1:").SetValue(new AbilityToggler(Items)));
             _items.AddItem(new MenuItem("Items2: ", "Items 2: ").SetValue(new AbilityToggler(Items2)));
+            _items2.AddItem(new MenuItem("Don't Use Combo on:", "Don't Use Combo on:").SetValue(new AbilityToggler(Items3)));
             Menu.AddToMainMenu();
             // Auto Attack Checker
             if (Game.GetConsoleVar("dota_player_units_auto_attack_after_spell").GetInt() == 1)
@@ -179,10 +189,20 @@ namespace Tinker_Perfect_type
             //    if (Utils.SleepCheck("CD_COMBO_FARM"))
             //        stage = 0;
             //}
+            if ((Game.IsKeyDown(Menu.Item("Smart Blink").GetValue<KeyBind>().Key)) && !Game.IsChatOpen)
+            {
+                Blink = me.FindItem("item_blink");
+                if(Blink != null && Blink.CanBeCasted() && !me.IsChanneling() && !me.Spellbook.Spells.Any(x => x.IsInAbilityPhase) && Utils.SleepCheck("blink"))
+                {
+                    var mousepos = Game.MousePosition;
+                    Blink.UseAbility(me.Distance2D(mousepos) < 1200 ? mousepos : new Vector3(me.NetworkPosition.X + 1150 * (float)Math.Cos(me.NetworkPosition.ToVector2().FindAngleBetween(mousepos.ToVector2(), true)), me.NetworkPosition.Y + 1150 * (float)Math.Sin(me.NetworkPosition.ToVector2().FindAngleBetween(mousepos.ToVector2(), true)), 100), false);
+                    Utils.Sleep(200, "blink");
+                }
+            }
             if ((Game.IsKeyDown(Menu.Item("Combo Key").GetValue<KeyBind>().Key)) && !Game.IsChatOpen)
             {
                 target = me.ClosestToMouseTarget(1000);
-                if (target != null && target.IsAlive && !target.IsIllusion && !me.IsChanneling() && !me.Spellbook.Spells.Any(x => x.IsInAbilityPhase))
+                if (target != null && target.IsAlive && !target.IsIllusion && !me.IsChanneling() && !me.Spellbook.Spells.Any(x => x.IsInAbilityPhase) && !CanReflectDamage(target))
                 {
                     autoattack(true);
                     FindItems();
@@ -210,7 +230,7 @@ namespace Tinker_Perfect_type
                             {
                                 Ethereal.UseAbility(target);
                                 Utils.Sleep(200, "TimingToLinkens");
-                                Utils.Sleep((1200 / me.NetworkPosition.Distance2D(target.NetworkPosition)) * 1000, "TimingToLinkens");
+                                Utils.Sleep(((1200 / me.NetworkPosition.Distance2D(target.NetworkPosition)) * 1000) + 120, "TimingToLinkens");
                             }
                         }
                         else if (Laser != null && Laser.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Laser.Name))
@@ -256,6 +276,11 @@ namespace Tinker_Perfect_type
                         }
                         else
                             elsecount += 1;
+                        if(veil != null && veil.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(veil.Name) && Utils.SleepCheck("Rearm") && !Refresh.IsChanneling && Utils.SleepCheck("veil"))
+                        {
+                            veil.UseAbility(target.Position);
+                            Utils.Sleep(200, "veil");
+                        }
                         if (ghost != null && Ethereal == null && ghost.CanBeCasted() && Menu.Item("Items2: ").GetValue<AbilityToggler>().IsEnabled(ghost.Name) && Utils.SleepCheck("Rearm") && !Refresh.IsChanneling && Utils.SleepCheck("ghost"))
                         {
                             ghost.UseAbility();
@@ -336,7 +361,7 @@ namespace Tinker_Perfect_type
                         }
                         else
                         {
-                            if (!me.IsChanneling() && me.CanAttack() && Utils.SleepCheck("Rearm") && me.Distance2D(target) <= me.AttackRange)
+                            if (!me.IsChanneling() && me.CanAttack() && Utils.SleepCheck("Rearm"))
                                 Orbwalking.Orbwalk(target);
                         }
                     }
@@ -344,7 +369,7 @@ namespace Tinker_Perfect_type
                 else
                 {
                     autoattack(false);
-                    if (!me.IsChanneling() && Utils.SleepCheck("Rearm"))
+                    if (!me.IsChanneling() && Utils.SleepCheck("Rearm") && !me.Spellbook.Spells.Any(x => x.IsInAbilityPhase))
                         me.Move(Game.MousePosition);
                 }
             }
@@ -406,15 +431,13 @@ namespace Tinker_Perfect_type
             forcestaff = me.FindItem("item_force_staff");
             glimmer = me.FindItem("item_glimmer_cape");
             bottle = me.FindItem("item_bottle");
+            veil = me.FindItem("item_veil_of_discord");
             travel = me.Inventory.Items.FirstOrDefault(item => item.Name.Contains("item_travel_boots"));
         }
         static Vector2 HeroPositionOnScreen(Hero x)
         {
-            float scaleX = HUDInfo.ScreenSizeX();
-            float scaleY = HUDInfo.ScreenSizeY();
             Vector2 PicPosition;
-            Drawing.WorldToScreen(x.Position, out PicPosition);
-            PicPosition = new Vector2((float)(PicPosition.X + (scaleX * -0.035)), (float)((PicPosition.Y) + (scaleY * -0.10)));
+            PicPosition = new Vector2(HUDInfo.GetHPbarPosition(x).X - 1, HUDInfo.GetHPbarPosition(x).Y - 40);
             return PicPosition;
         }
         static bool Ready_for_refresh()
@@ -444,9 +467,16 @@ namespace Tinker_Perfect_type
             Console.WriteLine(text, arguments);
             Console.ForegroundColor = clr;
         }
-        static bool IsLinkensProtected(Hero x)
+        //static bool IsLinkensProtected(Hero x)
+        //{
+        //    if (x.Modifiers.Any(m => m.Name == "modifier_item_sphere_target") || x.FindItem("item_sphere") != null && x.FindItem("item_sphere").Cooldown <= 0)
+        //        return true;
+        //    else
+        //        return false;
+        //}
+        static bool CanReflectDamage(Hero x)
         {
-            if (x.Modifiers.Any(m => m.Name == "modifier_item_sphere_target") || x.FindItem("item_sphere") != null && x.FindItem("item_sphere").Cooldown <= 0)
+            if (x.Modifiers.Any(m => (m.Name == "modifier_item_blade_mail_reflect" && Menu.Item("Don't Use Combo on:").GetValue<AbilityToggler>().IsEnabled("item_blade_mail")) || (m.Name == "modifier_item_lotus_orb_active") && Menu.Item("Don't Use Combo on:").GetValue<AbilityToggler>().IsEnabled("item_lotus_orb")))
                 return true;
             else
                 return false;

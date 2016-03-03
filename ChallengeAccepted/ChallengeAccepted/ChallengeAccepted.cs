@@ -15,72 +15,82 @@ namespace ChallengeAccepted
 {
     class ChallengeAccepted
     {
-        private static readonly Menu Menu = new Menu("Challenge Accepted", "ChallengeAccepted", true);
-        private static readonly Menu _item_config = new Menu("Ofensive Items", "Ofensive Items");
-        private static readonly Menu _1_item_config = new Menu("Defensive Items", "Defensive Items");
-        private static readonly Menu _2_item_config = new Menu("Remove Linkens Items", "Remove Linkens Items");
-        private static readonly Menu _3_item_config = new Menu("Consume Items", "Consume Items");
+        private static readonly Menu Menu = new Menu("Challenge Accepted", "ChallengeAccepted", true, "npc_dota_hero_legion_commander", true);
+        private static readonly Menu _item_config = new Menu("Duel Items", "Duel Items");
+        private static readonly Menu _2_item_config = new Menu("Pop Linkens: ", "Pop Linkens: ");
+        private static readonly Menu _3_item_config = new Menu("Mana/Health Itens: ", "Mana/Health Itens: ");
         private static readonly Menu _skill_config = new Menu("Skills", "Skills");
         private static Ability Duel, Heal, Odds;
         private static Item blink, armlet, blademail, bkb, abyssal, mjollnir, halberd, medallion, madness, urn, satanic, solar, dust, sentry, mango, arcane, buckler, crimson, lotusorb, cheese, magistick, magicwand, soulring, force, cyclone, vyse;
         private static Hero me, target;
-        private static readonly Dictionary<string, bool> ofensive_items = new Dictionary<string, bool>
+        private static readonly Dictionary<string, bool> duel_items = new Dictionary<string, bool>
             {
                 {"item_blink",true},
                 {"item_armlet",true},
                 {"item_abyssal_blade",true},
                 {"item_mjollnir",true},
+            };
+        private static readonly Dictionary<string, bool> duel_items2 = new Dictionary<string, bool>
+            {
                 {"item_medallion_of_courage",true},
                 {"item_mask_of_madness",true},
                 {"item_urn_of_shadows",true},
                 {"item_solar_crest",true}
             };
-        private static readonly Dictionary<string, bool> defensive_items = new Dictionary<string, bool>
+        private static readonly Dictionary<string, bool> duel_items3 = new Dictionary<string, bool>
             {
                 {"item_black_king_bar",true},
-                {"item_armlet",true},
                 {"item_blade_mail",true},
-                {"item_satanic",true},
+                {"item_satanic",true}
+            };
+        private static readonly Dictionary<string, bool> duel_items4 = new Dictionary<string, bool>
+            {
                 {"item_lotus_orb",true},
                 {"item_magic_stick",true},
                 {"item_magic_wand",true}
             };
-        private static readonly Dictionary<string, bool> remove_linkens_items = new Dictionary<string, bool>
+        private static readonly Dictionary<string, bool> pop_linkens_itens = new Dictionary<string, bool>
             {
                 {"item_heavens_halberd",true},
                 {"item_force_staff",true},
                 {"item_cyclone",true},
-                {"item_sheepstick",true}
+                {"item_sheepstick",true},
+                {"item_abyssal_blade",true}
             };
         private static readonly Dictionary<string, bool> skills = new Dictionary<string, bool>
             {
                 {"legion_commander_press_the_attack",true},
                 {"legion_commander_overwhelming_odds",true}
             };
-        private static readonly Dictionary<string, bool> consume_items = new Dictionary<string, bool>
+        private static readonly Dictionary<string, bool> healormana_items = new Dictionary<string, bool>
             {
-                {"item_dust",true},
-                {"item_ward_sentry",true},
-                {"item_enchanted_mango",true},
-                {"item_arcane_boots",true},
                 {"item_buckler",true},
                 {"item_crimson_guard",true},
                 {"item_cheese",true},
                 {"item_soul_ring",true}
+            };
+        private static readonly Dictionary<string, bool> healormana_items2 = new Dictionary<string, bool>
+            {
+                {"item_dust",true},
+                {"item_ward_sentry",true},
+                {"item_enchanted_mango",true},
+                {"item_arcane_boots",true}
             };
         static void Main(string[] args)
         {
             Menu.AddItem(new MenuItem("DUEL!", "DUEL!").SetValue(new KeyBind('D', KeyBindType.Press)));
             Menu.AddItem(new MenuItem("Black King Bar Toggle", "Black King Bar Toggle").SetValue(new KeyBind('F', KeyBindType.Press)));
             Menu.AddSubMenu(_item_config);
-            Menu.AddSubMenu(_1_item_config);
             Menu.AddSubMenu(_2_item_config);
             Menu.AddSubMenu(_3_item_config);
             Menu.AddSubMenu(_skill_config);
-            _item_config.AddItem(new MenuItem("Ofensive Items", "Ofensive Items").SetValue(new AbilityToggler(ofensive_items)));
-            _1_item_config.AddItem(new MenuItem("Defensive Items", "Defensive Items").SetValue(new AbilityToggler(defensive_items)));
-            _2_item_config.AddItem(new MenuItem("Remove Linkens Items", "Remove Linkens Items").SetValue(new AbilityToggler(remove_linkens_items)));
-            _3_item_config.AddItem(new MenuItem("Consume Items", "Consume Items").SetValue(new AbilityToggler(consume_items)));
+            _item_config.AddItem(new MenuItem("Duel Items", " ").SetValue(new AbilityToggler(duel_items)));
+            _item_config.AddItem(new MenuItem("Duel Items2", " ").SetValue(new AbilityToggler(duel_items2)));
+            _item_config.AddItem(new MenuItem("Duel Items3", " ").SetValue(new AbilityToggler(duel_items3)));
+            _item_config.AddItem(new MenuItem("Duel Items4", " ").SetValue(new AbilityToggler(duel_items4)));
+            _2_item_config.AddItem(new MenuItem("Pop Linkens: ", "Pop Linkens: ").SetValue(new AbilityToggler(pop_linkens_itens)));
+            _3_item_config.AddItem(new MenuItem("Mana/Health Itens: ", " ").SetValue(new AbilityToggler(healormana_items)));
+            _3_item_config.AddItem(new MenuItem("Mana/Health Itens2: ", " ").SetValue(new AbilityToggler(healormana_items2)));
             _skill_config.AddItem(new MenuItem("Skills", "Skills").SetValue(new AbilityToggler(skills)));
             Menu.AddToMainMenu();
             PrintSuccess(">Challenge Accepted");
@@ -96,14 +106,14 @@ namespace ChallengeAccepted
                 return;
             if (Game.IsKeyDown(Menu.Item("Black King Bar Toggle").GetValue<KeyBind>().Key) && !Game.IsChatOpen && Utils.SleepCheck("BKBTOGGLE"))
             {
-                defensive_items["item_black_king_bar"] = !Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled("item_black_king_bar");
+                duel_items3["item_black_king_bar"] = !Menu.Item("Duel Items3").GetValue<AbilityToggler>().IsEnabled("item_black_king_bar");
                 Utils.Sleep(750, "BKBTOGGLE");
             }
                 if (Game.IsKeyDown(Menu.Item("DUEL!").GetValue<KeyBind>().Key) && !Game.IsChatOpen)
             {
                 FindItems();
                 target = me.ClosestToMouseTarget(1000);
-                if (target != null && target.IsAlive && !target.IsIllusion && !target.IsInvul() && (blink != null ? me.Distance2D(target) <= 1300 : me.Distance2D(target) <= 600))
+                if (target != null && !target.IsInvul() && (blink != null ? me.Distance2D(target) <= 1300 : me.Distance2D(target) <= 600))
                 {
                     if (me.CanAttack() && me.CanCast())
                     {
@@ -114,60 +124,60 @@ namespace ChallengeAccepted
                             manacheck();
                             if (target.IsLinkensProtected())
                             {
-                                if ((cyclone.CanBeCasted() || force.CanBeCasted() || halberd.CanBeCasted() || vyse.CanBeCasted() || abyssal.CanBeCasted()) && Utils.SleepCheck("Combo2"))
+                                if (((cyclone.CanBeCasted() && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(cyclone.Name)) || (force.CanBeCasted() && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(force.Name)) || (halberd.CanBeCasted() && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(halberd.Name)) || (vyse.CanBeCasted() && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(vyse.Name)) || (abyssal.CanBeCasted() && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(abyssal.Name))) && Utils.SleepCheck("Combo2"))
                                 {
-                                    if (blademail != null && blademail.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(blademail.Name) && me.Mana - blademail.ManaCost >= 75)
+                                    if (blademail != null && blademail.Cooldown <= 0 && Menu.Item("Duel Items3").GetValue<AbilityToggler>().IsEnabled(blademail.Name) && me.Mana - blademail.ManaCost >= 75)
                                         blademail.UseAbility();
-                                    if (satanic != null && satanic.Cooldown <= 0 && me.Health <= me.MaximumHealth * 0.5 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(satanic.Name))
+                                    if (satanic != null && satanic.Cooldown <= 0 && me.Health <= me.MaximumHealth * 0.5 && Menu.Item("Duel Items3").GetValue<AbilityToggler>().IsEnabled(satanic.Name))
                                         satanic.UseAbility();
-                                    if (crimson != null && crimson.Cooldown <= 0 && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(crimson.Name))
+                                    if (crimson != null && crimson.Cooldown <= 0 && Menu.Item("Mana/Health Itens: ").GetValue<AbilityToggler>().IsEnabled(crimson.Name))
                                         crimson.UseAbility();
-                                    if (buckler != null && buckler.Cooldown <= 0 && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(buckler.Name) && me.Mana - buckler.ManaCost >= 75)
+                                    if (buckler != null && buckler.Cooldown <= 0 && Menu.Item("Mana/Health Itens: ").GetValue<AbilityToggler>().IsEnabled(buckler.Name) && me.Mana - buckler.ManaCost >= 75)
                                         buckler.UseAbility();
-                                    if (lotusorb != null && lotusorb.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(lotusorb.Name) && me.Mana - lotusorb.ManaCost >= 75)
+                                    if (lotusorb != null && lotusorb.Cooldown <= 0 && Menu.Item("Duel Items4").GetValue<AbilityToggler>().IsEnabled(lotusorb.Name) && me.Mana - lotusorb.ManaCost >= 75)
                                         lotusorb.UseAbility(me);
-                                    if (mjollnir != null && mjollnir.Cooldown <= 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(mjollnir.Name) && me.Mana - mjollnir.ManaCost >= 75)
+                                    if (mjollnir != null && mjollnir.Cooldown <= 0 && Menu.Item("Duel Items").GetValue<AbilityToggler>().IsEnabled(mjollnir.Name) && me.Mana - mjollnir.ManaCost >= 75)
                                         mjollnir.UseAbility(me);
-                                    if (armlet != null && !armlet.IsToggled && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(armlet.Name) && Utils.SleepCheck("armlet"))
+                                    if (armlet != null && !armlet.IsToggled && Menu.Item("Duel Items").GetValue<AbilityToggler>().IsEnabled(armlet.Name) && Utils.SleepCheck("armlet"))
                                     {
                                         armlet.ToggleAbility();
                                         Utils.Sleep(300, "armlet");
                                     }
-                                    if (madness != null && madness.Cooldown <= 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(madness.Name) && me.Mana - madness.ManaCost >= 75)
+                                    if (madness != null && madness.Cooldown <= 0 && Menu.Item("Duel Items2").GetValue<AbilityToggler>().IsEnabled(madness.Name) && me.Mana - madness.ManaCost >= 75)
                                         madness.UseAbility();
                                     if (Heal != null && Heal.Level > 0 && Heal.Cooldown <= 0 && Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(Heal.Name) && !me.IsMagicImmune() && me.Mana - Heal.ManaCost >= 75)
                                         Heal.UseAbility(me);
-                                    if (bkb != null && bkb.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(bkb.Name) && (!Heal.CanBeCasted() || Heal == null))
+                                    if (bkb != null && bkb.Cooldown <= 0 && Menu.Item("Duel Items3").GetValue<AbilityToggler>().IsEnabled(bkb.Name) && (!Heal.CanBeCasted() || Heal == null || !Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(Heal.Name)))
                                         bkb.UseAbility();
-                                    if (blink != null && blink.Cooldown <= 0 && me.Distance2D(target) <= 1300 && me.Distance2D(target) >= 200 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(blink.Name))
-                                        blink.UseAbility(target.Position);
-                                    if (urn != null && urn.CurrentCharges > 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(urn.Name))
+                                    if (blink != null && blink.Cooldown <= 0 && me.Distance2D(target) <= 1300 && me.Distance2D(target) >= 200 && Menu.Item("Duel Items").GetValue<AbilityToggler>().IsEnabled(blink.Name))
+                                        blink.UseAbility(me.Distance2D(target.NetworkPosition) < 1200 ? target.NetworkPosition : new Vector3(me.NetworkPosition.X + 1150 * (float)Math.Cos(me.NetworkPosition.ToVector2().FindAngleBetween(target.NetworkPosition.ToVector2(), true)), me.NetworkPosition.Y + 1150 * (float)Math.Sin(me.NetworkPosition.ToVector2().FindAngleBetween(target.NetworkPosition.ToVector2(), true)), 100), false);
+                                    if (urn != null && urn.CurrentCharges > 0 && Menu.Item("Duel Items2").GetValue<AbilityToggler>().IsEnabled(urn.Name))
                                         urn.UseAbility(target);
-                                    if (solar != null && solar.CanBeCasted() && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(solar.Name))
+                                    if (solar != null && solar.CanBeCasted() && Menu.Item("Duel Items2").GetValue<AbilityToggler>().IsEnabled(solar.Name))
                                         solar.UseAbility(target);
-                                    if (medallion != null && medallion.CanBeCasted() && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(medallion.Name))
+                                    if (medallion != null && medallion.CanBeCasted() && Menu.Item("Duel Items2").GetValue<AbilityToggler>().IsEnabled(medallion.Name))
                                         medallion.UseAbility(target);
-                                    if (cyclone != null && cyclone.CanBeCasted() && Utils.SleepCheck("CycloneRemoveLinkens") && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(cyclone.Name) && me.Mana - cyclone.ManaCost >= 75)
+                                    if (cyclone != null && cyclone.CanBeCasted() && Utils.SleepCheck("CycloneRemoveLinkens") && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(cyclone.Name) && me.Mana - cyclone.ManaCost >= 75)
                                     {
                                         cyclone.UseAbility(target);
                                         Utils.Sleep(100, "CycloneRemoveLinkens");
                                     }
-                                    else if (force != null && force.CanBeCasted() && Utils.SleepCheck("ForceRemoveLinkens") && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(force.Name) && me.Mana - force.ManaCost >= 75)
+                                    else if (force != null && force.CanBeCasted() && Utils.SleepCheck("ForceRemoveLinkens") && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(force.Name) && me.Mana - force.ManaCost >= 75)
                                     {
                                         force.UseAbility(target);
                                         Utils.Sleep(100, "ForceRemoveLinkens");
                                     }
-                                    else if (halberd != null && halberd.CanBeCasted() && Utils.SleepCheck("halberdLinkens") && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(halberd.Name) && me.Mana - halberd.ManaCost >= 75)
+                                    else if (halberd != null && halberd.CanBeCasted() && Utils.SleepCheck("halberdLinkens") && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(halberd.Name) && me.Mana - halberd.ManaCost >= 75)
                                     {
                                         halberd.UseAbility(target);
                                         Utils.Sleep(100, "halberdLinkens");
                                     }
-                                    else if (vyse != null && vyse.CanBeCasted() && Utils.SleepCheck("vyseLinkens") && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(vyse.Name) && me.Mana - vyse.ManaCost >= 75)
+                                    else if (vyse != null && vyse.CanBeCasted() && Utils.SleepCheck("vyseLinkens") && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(vyse.Name) && me.Mana - vyse.ManaCost >= 75)
                                     {
                                         vyse.UseAbility(target);
                                         Utils.Sleep(100, "vyseLinkens");
                                     }
-                                    else if (abyssal != null && abyssal.CanBeCasted() && Utils.SleepCheck("abyssal") && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(abyssal.Name) && me.Mana - abyssal.ManaCost >= 75)
+                                    else if (abyssal != null && abyssal.CanBeCasted() && Utils.SleepCheck("abyssal") && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(abyssal.Name) && me.Mana - abyssal.ManaCost >= 75)
                                     {
                                         abyssal.UseAbility(target);
                                         Utils.Sleep(100, "abyssal");
@@ -181,12 +191,12 @@ namespace ChallengeAccepted
                                 {
                                     if (me.Distance2D(target) <= 500)
                                     {
-                                        if (dust != null && dust.CanBeCasted() && Utils.SleepCheck("dust") && dust != null && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(dust.Name))
+                                        if (dust != null && dust.CanBeCasted() && Utils.SleepCheck("dust") && dust != null && Menu.Item("Mana/Health Itens2: ").GetValue<AbilityToggler>().IsEnabled(dust.Name))
                                         {
                                             dust.UseAbility();
                                             Utils.Sleep(100, "dust");
                                         }
-                                        else if (sentry != null && sentry.CanBeCasted() && Utils.SleepCheck("sentry") && sentry != null && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(sentry.Name))
+                                        else if (sentry != null && sentry.CanBeCasted() && Utils.SleepCheck("sentry") && sentry != null && Menu.Item("Mana/Health Itens2: ").GetValue<AbilityToggler>().IsEnabled(sentry.Name))
                                         {
                                             sentry.UseAbility(me.Position);
                                             Utils.Sleep(100, "sentry");
@@ -196,38 +206,38 @@ namespace ChallengeAccepted
                                 uint elsecount = 1;
                                 if (Utils.SleepCheck("combo"))
                                 {
-                                    if (blademail != null && blademail.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(blademail.Name) && me.Mana - blademail.ManaCost >= 75)
+                                    if (blademail != null && blademail.Cooldown <= 0 && Menu.Item("Duel Items3").GetValue<AbilityToggler>().IsEnabled(blademail.Name) && me.Mana - blademail.ManaCost >= 75)
                                         blademail.UseAbility();
                                     else
                                         elsecount += 1;
-                                    if (satanic != null && satanic.Cooldown <= 0 && me.Health <= me.MaximumHealth * 0.5 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(satanic.Name))
+                                    if (satanic != null && satanic.Cooldown <= 0 && me.Health <= me.MaximumHealth * 0.5 && Menu.Item("Duel Items3").GetValue<AbilityToggler>().IsEnabled(satanic.Name))
                                         satanic.UseAbility();
                                     else
                                         elsecount += 1;
-                                    if (crimson != null && crimson.Cooldown <= 0 && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(crimson.Name))
+                                    if (crimson != null && crimson.Cooldown <= 0 && Menu.Item("Mana/Health Itens: ").GetValue<AbilityToggler>().IsEnabled(crimson.Name))
                                         crimson.UseAbility();
                                     else
                                         elsecount += 1;
-                                    if (buckler != null && buckler.Cooldown <= 0 && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(buckler.Name) && me.Mana - buckler.ManaCost >= 75)
+                                    if (buckler != null && buckler.Cooldown <= 0 && Menu.Item("Mana/Health Itens: ").GetValue<AbilityToggler>().IsEnabled(buckler.Name) && me.Mana - buckler.ManaCost >= 75)
                                         buckler.UseAbility();
                                     else
                                         elsecount += 1;
-                                    if (lotusorb != null && lotusorb.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(lotusorb.Name) && me.Mana - lotusorb.ManaCost >= 75)
+                                    if (lotusorb != null && lotusorb.Cooldown <= 0 && Menu.Item("Duel Items4").GetValue<AbilityToggler>().IsEnabled(lotusorb.Name) && me.Mana - lotusorb.ManaCost >= 75)
                                         lotusorb.UseAbility(me);
                                     else
                                         elsecount += 1;
-                                    if (mjollnir != null && mjollnir.Cooldown <= 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(mjollnir.Name) && me.Mana - mjollnir.ManaCost >= 75)
+                                    if (mjollnir != null && mjollnir.Cooldown <= 0 && Menu.Item("Duel Items").GetValue<AbilityToggler>().IsEnabled(mjollnir.Name) && me.Mana - mjollnir.ManaCost >= 75)
                                         mjollnir.UseAbility(me);
                                     else
                                         elsecount += 1;
-                                    if (armlet != null && !armlet.IsToggled && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(armlet.Name) && Utils.SleepCheck("armlet"))
+                                    if (armlet != null && !armlet.IsToggled && Menu.Item("Duel Items").GetValue<AbilityToggler>().IsEnabled(armlet.Name) && Utils.SleepCheck("armlet"))
                                     {
                                         armlet.ToggleAbility();
                                         Utils.Sleep(300, "armlet");
                                     }
                                     else
                                         elsecount += 1;
-                                    if (madness != null && madness.Cooldown <= 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(madness.Name) && me.Mana - madness.ManaCost >= 75)
+                                    if (madness != null && madness.Cooldown <= 0 && Menu.Item("Duel Items2").GetValue<AbilityToggler>().IsEnabled(madness.Name) && me.Mana - madness.ManaCost >= 75)
                                         madness.UseAbility();
                                     else
                                         elsecount += 1;
@@ -235,27 +245,27 @@ namespace ChallengeAccepted
                                         Heal.UseAbility(me);
                                     else
                                         elsecount += 1;
-                                    if (bkb != null && bkb.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(bkb.Name) && (!Heal.CanBeCasted() || Heal == null))
+                                    if (bkb != null && bkb.Cooldown <= 0 && Menu.Item("Duel Items3").GetValue<AbilityToggler>().IsEnabled(bkb.Name) && (!Heal.CanBeCasted() || Heal == null))
                                         bkb.UseAbility();
                                     else
                                         elsecount += 1;
-                                    if (blink != null && blink.Cooldown <= 0 && me.Distance2D(target) <= 1300 && me.Distance2D(target) >= 200 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(blink.Name))
+                                    if (blink != null && blink.Cooldown <= 0 && me.Distance2D(target) <= 1300 && me.Distance2D(target) >= 200 && Menu.Item("Duel Items").GetValue<AbilityToggler>().IsEnabled(blink.Name))
                                         blink.UseAbility(target.Position);
                                     else
                                         elsecount += 1;
-                                    if (abyssal != null && abyssal.Cooldown <= 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(abyssal.Name) && me.Mana - abyssal.ManaCost >= 75)
+                                    if (abyssal != null && abyssal.Cooldown <= 0 && Menu.Item("Duel Items").GetValue<AbilityToggler>().IsEnabled(abyssal.Name) && me.Mana - abyssal.ManaCost >= 75)
                                         abyssal.UseAbility(target);
                                     else
                                         elsecount += 1;
-                                    if (urn != null && urn.CurrentCharges > 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(urn.Name))
+                                    if (urn != null && urn.CanBeCasted() && urn.CurrentCharges > 0 && Menu.Item("Duel Items2").GetValue<AbilityToggler>().IsEnabled(urn.Name))
                                         urn.UseAbility(target);
                                     else
                                         elsecount += 1;
-                                    if (solar != null && solar.CanBeCasted() && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(solar.Name))
+                                    if (solar != null && solar.CanBeCasted() && Menu.Item("Duel Items2").GetValue<AbilityToggler>().IsEnabled(solar.Name))
                                         solar.UseAbility(target);
                                     else
                                         elsecount += 1;
-                                    if (medallion != null && medallion.CanBeCasted() && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(medallion.Name))
+                                    if (medallion != null && medallion.CanBeCasted() && Menu.Item("Duel Items2").GetValue<AbilityToggler>().IsEnabled(medallion.Name))
                                         medallion.UseAbility(target);
                                     else
                                         elsecount += 1;
@@ -350,27 +360,27 @@ namespace ChallengeAccepted
             uint manacost = 0;
             if (me.IsAlive)
             {
-                if (blademail != null && blademail.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(blademail.Name))
+                if (blademail != null && blademail.Cooldown <= 0 && Menu.Item("Duel Items3").GetValue<AbilityToggler>().IsEnabled(blademail.Name))
                     manacost += blademail.ManaCost;
-                if (abyssal != null && abyssal.Cooldown <= 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(abyssal.Name))
+                if (abyssal != null && abyssal.Cooldown <= 0 && Menu.Item("Duel Items").GetValue<AbilityToggler>().IsEnabled(abyssal.Name))
                     manacost += abyssal.ManaCost;
-                if (mjollnir != null && mjollnir.Cooldown <= 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(mjollnir.Name))
+                if (mjollnir != null && mjollnir.Cooldown <= 0 && Menu.Item("Duel Items").GetValue<AbilityToggler>().IsEnabled(mjollnir.Name))
                     manacost += mjollnir.ManaCost;
-                if (halberd != null && halberd.Cooldown <= 0 && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(halberd.Name))
+                if (halberd != null && halberd.Cooldown <= 0 && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(halberd.Name))
                     manacost += halberd.ManaCost;
-                if (madness != null && madness.Cooldown <= 0 && Menu.Item("Ofensive Items").GetValue<AbilityToggler>().IsEnabled(madness.Name))
+                if (madness != null && madness.Cooldown <= 0 && Menu.Item("Duel Items2").GetValue<AbilityToggler>().IsEnabled(madness.Name))
                     manacost += madness.ManaCost;
-                if (lotusorb != null && lotusorb.Cooldown <= 0 && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(lotusorb.Name))
+                if (lotusorb != null && lotusorb.Cooldown <= 0 && Menu.Item("Duel Items4").GetValue<AbilityToggler>().IsEnabled(lotusorb.Name))
                     manacost += lotusorb.ManaCost;
-                if (buckler != null && buckler.Cooldown <= 0 && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(buckler.Name))
+                if (buckler != null && buckler.Cooldown <= 0 && Menu.Item("Mana/Health Itens: ").GetValue<AbilityToggler>().IsEnabled(buckler.Name))
                     manacost += buckler.ManaCost;
-                if (crimson != null && crimson.Cooldown <= 0 && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(crimson.Name))
+                if (crimson != null && crimson.Cooldown <= 0 && Menu.Item("Mana/Health Itens: ").GetValue<AbilityToggler>().IsEnabled(crimson.Name))
                     manacost += crimson.ManaCost;
-                if (force != null && force.Cooldown <= 0 && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(force.Name))
+                if (force != null && force.Cooldown <= 0 && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(force.Name))
                     manacost += force.ManaCost;
-                if (cyclone != null && cyclone.CanBeCasted() && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(cyclone.Name))
+                if (cyclone != null && cyclone.CanBeCasted() && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(cyclone.Name))
                     manacost += cyclone.ManaCost;
-                if (vyse != null && vyse.Cooldown <= 0 && Menu.Item("Remove Linkens Items").GetValue<AbilityToggler>().IsEnabled(vyse.Name))
+                if (vyse != null && vyse.Cooldown <= 0 && Menu.Item("Pop Linkens: ").GetValue<AbilityToggler>().IsEnabled(vyse.Name))
                     manacost += vyse.ManaCost;
                 if (Heal.Cooldown <= 0 && Heal.Level > 0 && Menu.Item("Skills").GetValue<AbilityToggler>().IsEnabled(Heal.Name))
                     manacost += Heal.ManaCost;
@@ -379,32 +389,32 @@ namespace ChallengeAccepted
             }
             if (manacost > me.Mana)
             {
-                if (mango.CanBeCasted() && mango != null && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(mango.Name) && Utils.SleepCheck("FastMango"))
+                if (mango.CanBeCasted() && mango != null && Menu.Item("Mana/Health Itens2: ").GetValue<AbilityToggler>().IsEnabled(mango.Name) && Utils.SleepCheck("FastMango"))
                 {
                     mango.UseAbility();
                     Utils.Sleep(Game.Ping, "FastMango");
                 }
-                if (arcane.CanBeCasted() && arcane != null && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(arcane.Name) && Utils.SleepCheck("FastArcane"))
+                if (arcane.CanBeCasted() && arcane != null && Menu.Item("Mana/Health Itens2: ").GetValue<AbilityToggler>().IsEnabled(arcane.Name) && Utils.SleepCheck("FastArcane"))
                 {
                     arcane.UseAbility();
                     Utils.Sleep(Game.Ping, "FastArcane");
                 }
-                if (magicwand.CanBeCasted() && magicwand != null && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(magicwand.Name) && Utils.SleepCheck("Fastmagicwand"))
+                if (magicwand.CanBeCasted() && magicwand != null && Menu.Item("Duel Items4").GetValue<AbilityToggler>().IsEnabled(magicwand.Name) && Utils.SleepCheck("Fastmagicwand"))
                 {
                     magicwand.UseAbility();
                     Utils.Sleep(Game.Ping, "Fastmagicwand");
                 }
-                if (magistick.CanBeCasted() && magistick != null && Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled(magistick.Name) && Utils.SleepCheck("Fastmagistick"))
+                if (magistick.CanBeCasted() && magistick != null && Menu.Item("Duel Items4").GetValue<AbilityToggler>().IsEnabled(magistick.Name) && Utils.SleepCheck("Fastmagistick"))
                 {
                     magistick.UseAbility();
                     Utils.Sleep(Game.Ping, "Fastmagistick");
                 }
-                if ((cheese.CanBeCasted() && cheese != null && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(cheese.Name) && me.Health <= me.MaximumHealth * 0.5) || me.Health <= me.MaximumHealth * 0.30 && Utils.SleepCheck("FastCheese"))
+                if ((cheese.CanBeCasted() && cheese != null && Menu.Item("Mana/Health Itens: ").GetValue<AbilityToggler>().IsEnabled(cheese.Name) && me.Health <= me.MaximumHealth * 0.5) || me.Health <= me.MaximumHealth * 0.30 && Utils.SleepCheck("FastCheese"))
                 {
                     cheese.UseAbility();
                     Utils.Sleep(Game.Ping, "FastCheese");
                 }
-                if (soulring.CanBeCasted() && soulring != null && Menu.Item("Consume Items").GetValue<AbilityToggler>().IsEnabled(soulring.Name) && Utils.SleepCheck("FastSoulRing"))
+                if (soulring.CanBeCasted() && soulring != null && Menu.Item("Mana/Health Itens: ").GetValue<AbilityToggler>().IsEnabled(soulring.Name) && Utils.SleepCheck("FastSoulRing"))
                 {
                     soulring.UseAbility();
                     Utils.Sleep(Game.Ping, "FastSoulRing");
@@ -421,22 +431,19 @@ namespace ChallengeAccepted
             if (me.ClassID != ClassID.CDOTA_Unit_Hero_Legion_Commander)
                 return;
             target = me.ClosestToMouseTarget(50000);
-            if(target != null && !target.IsIllusion && target.IsAlive)
+            if(target != null)
             {
                 Vector2 target_health_bar = HeroPositionOnScreen(target);
-                Drawing.DrawText("Marked for Death", target_health_bar, new Vector2(18, 200), me.Distance2D(target) < 1200 ? Color.Red : Color.Azure, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+                Drawing.DrawText("Marked for Death", target_health_bar, new Vector2(15, 200), me.Distance2D(target) < 1200 ? Color.Red : Color.Azure, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
             }
             if (!Utils.SleepCheck("BKBTOGGLE"))
-                Drawing.DrawText(Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled("item_black_king_bar") == true ? "ON" : "OFF",new Vector2(HUDInfo.ScreenSizeX()/2, HUDInfo.ScreenSizeY()/2), new Vector2(30, 200), Menu.Item("Defensive Items").GetValue<AbilityToggler>().IsEnabled("item_black_king_bar") == true ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
+                Drawing.DrawText(Menu.Item("Duel Items3").GetValue<AbilityToggler>().IsEnabled("item_black_king_bar") == true ? "ON" : "OFF",new Vector2(HUDInfo.ScreenSizeX()/2, HUDInfo.ScreenSizeY()/2), new Vector2(30, 200), Menu.Item("Duel Items3").GetValue<AbilityToggler>().IsEnabled("item_black_king_bar") == true ? Color.LimeGreen : Color.Red, FontFlags.AntiAlias | FontFlags.Additive | FontFlags.DropShadow);
 
         }
         static Vector2 HeroPositionOnScreen(Hero x)
         {
-            float scaleX = HUDInfo.ScreenSizeX();
-            float scaleY = HUDInfo.ScreenSizeY();
             Vector2 PicPosition;
-            Drawing.WorldToScreen(x.Position, out PicPosition);
-            PicPosition = new Vector2((float)(PicPosition.X + (scaleX * -0.035)), (float)((PicPosition.Y) + (scaleY * -0.10)));
+            PicPosition = new Vector2(HUDInfo.GetHPbarPosition(x).X - 1, HUDInfo.GetHPbarPosition(x).Y - 40);
             return PicPosition;
         }
         private static void PrintSuccess(string text, params object[] arguments)
