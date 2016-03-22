@@ -78,7 +78,8 @@ namespace Tinker_Perfect_type
                 auto_attack = false;
             // start
             PrintSuccess(string.Format("> Tinker Perfect Type Loaded!"));
-            Game.OnUpdate += Tinker_In_Madness;
+            //Game.OnUpdate
+            Game.OnWndProc += Tinker_In_Madness;
             Drawing.OnDraw += markedfordeath;
         }
         public static void Tinker_In_Madness(EventArgs args)
@@ -230,7 +231,7 @@ namespace Tinker_Perfect_type
                             {
                                 Ethereal.UseAbility(target);
                                 Utils.Sleep(200, "TimingToLinkens");
-                                Utils.Sleep(((1200 / me.NetworkPosition.Distance2D(target.NetworkPosition)) * 1000) + 120, "TimingToLinkens");
+                                Utils.Sleep(((me.NetworkPosition.Distance2D(target.NetworkPosition) / 1200) * 1000) + 200, "TimingToLinkens");
                             }
                         }
                         else if (Laser != null && Laser.CanBeCasted() && Menu.Item("Skills: ").GetValue<AbilityToggler>().IsEnabled(Laser.Name))
