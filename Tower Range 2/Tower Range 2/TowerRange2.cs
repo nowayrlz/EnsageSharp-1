@@ -3,7 +3,7 @@ using System.Linq;
 using Ensage;
 using SharpDX;
 using Ensage.Common.Menu;
-using Ensage.Common;
+//using Ensage.Common;
 using System.Collections.Generic;
 
 namespace Tower_Range_2
@@ -12,158 +12,125 @@ namespace Tower_Range_2
     {
         private static readonly Menu Menu = new Menu("Tower range 2", "Tower Range 2", true);
         private static Hero me;
-        private static ParticleEffect[] EFFECT1 = new ParticleEffect[30], EFFECT2 = new ParticleEffect[30];
-
-
+        private static Dictionary<string, ParticleEffect> rangeeffects = new Dictionary<string, ParticleEffect> { };
+        private static int range = 0, range2 = 0, radiusbonus = 0;
         static void Main(string[] args)
         {
             Menu.AddItem(new MenuItem("OwnTowers", "My Towers").SetValue(false).SetTooltip("Show your tower range."));
             Menu.AddItem(new MenuItem("EnemyTowers", "Enemies Towers").SetValue(false).SetTooltip("Show the enemies towers range."));
-            Menu.AddItem(
-                new MenuItem("Reload time", "Reload Time").SetValue(new Slider(500,15000))
-                    .SetTooltip("Set how many seconds to reload range check."));
             Menu.AddToMainMenu();
             Game.OnUpdate += FindTower;
+            Game.OnFireEvent += TowerDestroyed;
             PrintSuccess(string.Format("> Tower Range 2 Loaded!"));
         }
-
+        private static void TowerDestroyed(FireEventEventArgs args)
+        {
+            if (args.GameEvent.Name == "dota_tower_kill")
+            {
+                foreach(var x in rangeeffects.Values.ToList())
+                {
+                    x.Dispose();
+                }
+                rangeeffects.Clear();
+            }
+        }
         public static void FindTower(EventArgs args)
         {
             if (!Game.IsInGame)
                 return;
             me = ObjectMgr.LocalHero;
             if (me == null)
-                return;
-            List<Building> building =
-                ObjectMgr.GetEntities<Building>()
-                    .Where(x => x.IsAlive && (x.ClassID == ClassID.CDOTA_BaseNPC_Tower || x.ClassID == ClassID.CDOTA_BaseNPC_Fort))
-                    .ToList();
-            List<Entity> Fountain =
-                ObjectMgr.GetEntities<Entity>()
-                    .Where(x => x.IsAlive && x.ClassID == ClassID.CDOTA_Unit_Fountain)
-                    .ToList();
-            if (!building.Any() && !Fountain.Any())
-                return;
-            uint i = 0;
-            if (Menu.Item("EnemyTowers").GetValue<bool>() && Utils.SleepCheck("reload1"))
             {
-                foreach (Building build in building.Where(x => x.Team != me.Team).ToList())
-                {
-                    if (build != null)
-                    {
-                        if (build.ClassID == ClassID.CDOTA_BaseNPC_Tower)
-                        {
-                            i++;
-                            if (EFFECT1[i] == null)
-                                EFFECT1[i] = build.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                            if (EFFECT1[i].GetHighestControlPoint() != 1)
-                            {
-                                EFFECT1[i] = build.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                                EFFECT1[i].SetControlPoint(1, new Vector3(850, 0, 0));
-                            }
-                            if (EFFECT2[i] == null)
-                                EFFECT2[i] = build.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                            if (EFFECT2[i].GetHighestControlPoint() != 1)
-                            {
-                                EFFECT2[i] = build.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                                EFFECT2[i].SetControlPoint(1, new Vector3(900, 0, 0));
-                            }
-                        }
-                        if (build.ClassID == ClassID.CDOTA_BaseNPC_Fort)
-                        {
-                            i++;
-                            if (EFFECT1[i] == null)
-                                EFFECT1[i] = build.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                            if (EFFECT1[i].GetHighestControlPoint() != 1)
-                            {
-                                EFFECT1[i] = build.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                                EFFECT1[i].SetControlPoint(1, new Vector3(900, 0, 0));
-                            }
-                        }
-                    }
-                }
-                foreach (Entity f in Fountain.Where(x => x.Team != me.Team).ToList())
-                {
-                    if (f != null)
-                    {
-                        i++;
-                        if (EFFECT1[i] == null)
-                            EFFECT1[i] = f.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                        if (EFFECT1[i].GetHighestControlPoint() != 1)
-                        {
-                            EFFECT1[i] = f.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                            EFFECT1[i].SetControlPoint(1, new Vector3(1200, 0, 0));
-                        }
-                        if (EFFECT2[i] == null)
-                            EFFECT2[i] = f.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                        if (EFFECT2[i].GetHighestControlPoint() != 1)
-                        {
-                            EFFECT2[i] = f.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                            EFFECT2[i].SetControlPoint(1, new Vector3(1350, 0, 0));
-                        }
-                    }
-                }
-                Utils.Sleep(Menu.Item("Reload time").GetValue<Slider>().Value, "reload1");
+                radiusbonus = 0;
+                return;
             }
-            if (Menu.Item("OwnTowers").GetValue<bool>() && Utils.SleepCheck("reload"))
+            if(radiusbonus == 0)
+                radiusbonus = (int)me.HullRadius;
+            List<Entity> building =
+                ObjectMgr.GetEntities<Entity>()
+                    .Where(x => x.IsAlive && (x.ClassID == ClassID.CDOTA_BaseNPC_Tower || x.ClassID == ClassID.CDOTA_BaseNPC_Fort || x.ClassID == ClassID.CDOTA_Unit_Fountain))
+                    .ToList();
+            if (!building.Any() && building == null)
+                return;
+            if (Menu.Item("EnemyTowers").GetValue<bool>())
             {
-                foreach (Building build in building.Where(x => x.Team == me.Team).ToList())
+                foreach(var x in building)
                 {
-                    if (build != null)
+                    if (x.Team == me.Team) continue;
+                    if(x.ClassID == ClassID.CDOTA_BaseNPC_Tower)
                     {
-                        if (build.ClassID == ClassID.CDOTA_BaseNPC_Tower)
-                        {
-                            i++;
-                            if (EFFECT1[i] == null)
-                                EFFECT1[i] = build.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                            if (EFFECT1[i].GetHighestControlPoint() != 1)
-                            {
-                                EFFECT1[i] = build.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                                EFFECT1[i].SetControlPoint(1, new Vector3(850, 0, 0));
-                            }
-                            if (EFFECT2[i] == null)
-                                EFFECT2[i] = build.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                            if (EFFECT2[i].GetHighestControlPoint() != 1)
-                            {
-                                EFFECT2[i] = build.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                                EFFECT2[i].SetControlPoint(1, new Vector3(900, 0, 0));
-                            }
-                        }
-                        if (build.ClassID == ClassID.CDOTA_BaseNPC_Fort)
-                        {
-                            i++;
-                            if (EFFECT1[i] == null)
-                                EFFECT1[i] = build.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                            if (EFFECT1[i].GetHighestControlPoint() != 1)
-                            {
-                                EFFECT1[i] = build.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                                EFFECT1[i].SetControlPoint(1, new Vector3(900, 0, 0));
-                            }
-                        }
+                        range = 900 + radiusbonus +50;
+                        range2 = 850 + radiusbonus + 50;
+                    }
+                    if(x.ClassID == ClassID.CDOTA_BaseNPC_Fort)
+                    {
+                        range = 900 + radiusbonus + 50;
+                        range2 = 0;
+                    }
+                    if(x.ClassID == ClassID.CDOTA_Unit_Fountain)
+                    {
+                        range = 1200 + radiusbonus + 50;
+                        range2 = 1350 + radiusbonus + 50;
+                    }
+                    if (!rangeeffects.Keys.Any(y => y == "" + x.Handle + ""))
+                    {
+                        rangeeffects.Add(""+x.Handle+"", new ParticleEffect(@"particles\ui_mouseactions\drag_selected_ring.vpcf", x));
+                    }
+                    if(rangeeffects.Keys.Any(y => y == "" + x.Handle + ""))
+                    {
+                        rangeeffects.FirstOrDefault(y => y.Key == "" + x.Handle + "").Value.SetControlPoint(1, new Vector3(30, 144, 255));
+                        rangeeffects.FirstOrDefault(y => y.Key == "" + x.Handle + "").Value.SetControlPoint(2, new Vector3(range, 255, 0));
+                    }
+                    if (!rangeeffects.Keys.Any(y => y == "" + x.Handle + "2"))
+                    {
+                        rangeeffects.Add("" + x.Handle + "2", new ParticleEffect(@"particles\ui_mouseactions\drag_selected_ring.vpcf", x));
+                    }
+                    if (rangeeffects.Keys.Any(y => y == "" + x.Handle + "2") && range2 > 0)
+                    {
+                        rangeeffects.FirstOrDefault(y => y.Key == "" + x.Handle + "2").Value.SetControlPoint(1, new Vector3(178, 34, 34));
+                        rangeeffects.FirstOrDefault(y => y.Key == "" + x.Handle + "2").Value.SetControlPoint(2, new Vector3(range2, 255, 0));
                     }
                 }
-                foreach (Entity f in Fountain.Where(x => x.Team == me.Team).ToList())
+            }
+            if (Menu.Item("OwnTowers").GetValue<bool>())
+            {
+                foreach (var x in building)
                 {
-                    if (f != null)
+                    if (x.Team != me.Team) continue;
+                    if (x.ClassID == ClassID.CDOTA_BaseNPC_Tower)
                     {
-                        i++;
-                        if (EFFECT1[i] == null)
-                            EFFECT1[i] = f.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                        if (EFFECT1[i].GetHighestControlPoint() != 1)
-                        {
-                            EFFECT1[i] = f.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                            EFFECT1[i].SetControlPoint(1, new Vector3(1200, 0, 0));
-                        }
-                        if (EFFECT2[i] == null)
-                            EFFECT2[i] = f.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                        if (EFFECT2[i].GetHighestControlPoint() != 1)
-                        {
-                            EFFECT2[i] = f.AddParticleEffect(@"particles\ui_mouseactions\range_display.vpcf");
-                            EFFECT2[i].SetControlPoint(1, new Vector3(1350, 0, 0));
-                        }
+                        range = 900 + radiusbonus + 50;
+                        range2 = 850 + radiusbonus + 50;
+                    }
+                    if (x.ClassID == ClassID.CDOTA_BaseNPC_Fort)
+                    {
+                        range = 900 + radiusbonus + 50;
+                        range2 = 0;
+                    }
+                    if (x.ClassID == ClassID.CDOTA_Unit_Fountain)
+                    {
+                        range = 1200 + radiusbonus + 50;
+                        range2 = 1350 + radiusbonus + 50;
+                    }
+                    if (!rangeeffects.Keys.Any(y => y == "" + x.Handle + ""))
+                    {
+                        rangeeffects.Add("" + x.Handle + "", new ParticleEffect(@"particles\ui_mouseactions\drag_selected_ring.vpcf", x));
+                    }
+                    if (rangeeffects.Keys.Any(y => y == "" + x.Handle + ""))
+                    {
+                        rangeeffects.FirstOrDefault(y => y.Key == "" + x.Handle + "").Value.SetControlPoint(1, new Vector3(30, 144, 255));
+                        rangeeffects.FirstOrDefault(y => y.Key == "" + x.Handle + "").Value.SetControlPoint(2, new Vector3(range, 255, 0));
+                    }
+                    if (!rangeeffects.Keys.Any(y => y == "" + x.Handle + "2"))
+                    {
+                        rangeeffects.Add("" + x.Handle + "2", new ParticleEffect(@"particles\ui_mouseactions\drag_selected_ring.vpcf", x));
+                    }
+                    if (rangeeffects.Keys.Any(y => y == "" + x.Handle + "2") && range2 > 0)
+                    {
+                        rangeeffects.FirstOrDefault(y => y.Key == "" + x.Handle + "2").Value.SetControlPoint(1, new Vector3(178, 34, 34));
+                        rangeeffects.FirstOrDefault(y => y.Key == "" + x.Handle + "2").Value.SetControlPoint(2, new Vector3(range2, 255, 0));
                     }
                 }
-                Utils.Sleep(Menu.Item("Reload time").GetValue<Slider>().Value, "reload");
             }
         }
         private static void PrintSuccess(string text, params object[] arguments)
