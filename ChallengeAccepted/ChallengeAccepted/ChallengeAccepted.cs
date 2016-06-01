@@ -25,42 +25,42 @@ namespace ChallengeAccepted
         private static Hero me, target;
         private static readonly Dictionary<string, bool> duel_items = new Dictionary<string, bool>
             {
-                {"item_blink",true},
-                {"item_armlet",true},
-                {"item_abyssal_blade",true},
-                {"item_mjollnir",true},
+                {"imba_blink",true},
+                {"imba_armlet",true},
+                {"imba_abyssal_blade",true},
+                {"imba_mjollnir",true},
             };
         private static readonly Dictionary<string, bool> duel_items2 = new Dictionary<string, bool>
             {
-                {"item_medallion_of_courage",true},
-                {"item_mask_of_madness",true},
-                {"item_urn_of_shadows",true},
-                {"item_solar_crest",true}
+                {"imba_medallion_of_courage",true},
+                {"imba_mask_of_madness",true},
+                {"imba_urn_of_shadows",true},
+                {"imba_solar_crest",true}
             };
         private static readonly Dictionary<string, bool> duel_items3 = new Dictionary<string, bool>
             {
-                {"item_black_king_bar",true},
-                {"item_blade_mail",true},
-                {"item_satanic",true}
+                {"imba_black_king_bar",true},
+                {"imba_blade_mail",true},
+                {"imba_satanic",true}
             };
         private static readonly Dictionary<string, bool> duel_items4 = new Dictionary<string, bool>
             {
-                {"item_lotus_orb",true},
-                {"item_magic_stick",true},
-                {"item_magic_wand",true}
+                {"imba_lotus_orb",true},
+                {"imba_magic_stick",true},
+                {"imba_magic_wand",true}
             };
         private static readonly Dictionary<string, bool> pop_linkens_itens = new Dictionary<string, bool>
             {
-                {"item_sheepstick",true},
-                {"item_abyssal_blade",true},
-                {"item_diffusal_blade",true},
-                {"item_rod_of_atos",true}
+                {"imba_sheepstick",true},
+                {"imba_abyssal_blade",true},
+                {"imba_diffusal_blade",true},
+                {"imba_rod_of_atos",true}
             };
         private static readonly Dictionary<string, bool> pop_linkens_itens2 = new Dictionary<string, bool>
             {
-                {"item_heavens_halberd",true},
-                {"item_force_staff",true},
-                {"item_cyclone",true},
+                {"imba_heavens_halberd",true},
+                {"imba_force_staff",true},
+                {"imba_cyclone",true},
             };
         private static readonly Dictionary<string, bool> skills = new Dictionary<string, bool>
             {
@@ -69,17 +69,17 @@ namespace ChallengeAccepted
             };
         private static readonly Dictionary<string, bool> healormana_items = new Dictionary<string, bool>
             {
-                {"item_buckler",true},
-                {"item_crimson_guard",true},
-                {"item_cheese",true},
-                {"item_soul_ring",true}
+                {"imba_buckler",true},
+                {"imba_crimson_guard",true},
+                {"imba_cheese",true},
+                {"imba_soul_ring",true}
             };
         private static readonly Dictionary<string, bool> healormana_items2 = new Dictionary<string, bool>
             {
-                {"item_dust",true},
-                {"item_ward_sentry",true},
-                {"item_enchanted_mango",true},
-                {"item_arcane_boots",true}
+                {"imba_dust",true},
+                {"imba_ward_sentry",true},
+                {"imba_enchanted_mango",true},
+                {"imba_arcane_boots",true}
             };
         static void Main(string[] args)
         {
